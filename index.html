@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cipher Studio</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+    }
+    .app {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    header {
+      text-align: center;
+      color: white;
+    }
+    header h1 {
+      position: relative;
+      margin: 0;
+      font-size: 2.4rem;
+      font-weight: 700;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    header h1 .backdrop-text {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.32);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      z-index: 0;
+      pointer-events: none;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.25);
+    }
+    header h1 span {
+      position: relative;
+      z-index: 1;
+    }
+    header p {
+      margin: 8px 0 0;
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+    .main {
+      background: #1a1a2e;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .left-panel {
+      padding: 28px;
+      border-right: 1px solid #333;
+      background: #16213e;
+    }
+    .right-panel {
+      padding: 28px;
+      background: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #7a7a7a;
+      margin: 0 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #7a7a7a;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e0e0e0;
+    }
+    textarea,
+    input,
+    select {
+      width: 100%;
+      border-radius: 10px;
+      border: 2px solid #333;
+      background: #0f0f1e;
+      color: #e0e0e0;
+      font-size: 0.95rem;
+      padding: 12px 14px;
+      font-family: inherit;
+      transition: border-color 0.2s ease;
+    }
+    textarea,
+    input,
+    select:focus {
+      border-color: #7a7a7a;
+      outline: none;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+      font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace;
+    }
+    .algo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .algo-btn {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 2px solid #333;
+      background: #0f0f1e;
+      color: #e0e0e0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .algo-btn:hover {
+      border-color: #7a7a7a;
+      background: #1a2a4e;
+    }
+    .algo-btn.active {
+      background: #7a7a7a;
+      color: #000;
+      border-color: #7a7a7a;
+    }
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    button.primary {
+      background: #7a7a7a;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    button.primary:hover {
+      background: #8a8a8a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(122, 122, 122, 0.3);
+    }
+    button.secondary {
+      background: #2a3a5a;
+      color: #e0e0e0;
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    button.secondary:hover {
+      background: #3a4a6a;
+      border-color: #7a7a7a;
+    }
+    .output-card {
+      background: #0f0f1e;
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    .output-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #7a7a7a;
+    }
+    .output-text {
+      background: #16213e;
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 80px;
+      border: 1px solid #333;
+      font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: #e0e0e0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-y: auto;
+      max-height: 200px;
+    }
+    .brute-list {
+      max-height: 300px;
+      overflow-y: auto;
+      background: #16213e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 8px;
+    }
+    .brute-item {
+      padding: 8px 10px;
+      border-bottom: 1px solid #2a3a5a;
+      font-size: 0.9rem;
+      font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace;
+      color: #e0e0e0;
+    }
+    .brute-item:last-child {
+      border-bottom: none;
+    }
+    .note {
+      font-size: 0.85rem;
+      color: #999;
+      margin-top: -4px;
+    }
+    .copy-button {
+      align-self: flex-end;
+      background: #7a7a7a;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .copy-button:hover {
+      background: #8a8a8a;
+    }
+    @media (max-width: 1000px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+      .left-panel {
+        border-right: none;
+        border-bottom: 1px solid #333;
+      }
+      .algo-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .app {
+        padding: 16px;
+      }
+      header h1 {
+        font-size: 1.8rem;
+      }
+      .algo-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .left-panel,
+      .right-panel {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1><span class="backdrop-text">bricy's</span><span>🔐 Cipher Studio</span></h1>
+      <p>Encode, decode, and analyze text with multiple cipher algorithms</p>
+    </header>
+    <div class="main">
+      <div class="left-panel">
+        <div class="section-title">Algorithm</div>
+        <div class="algo-grid">
+          <button class="algo-btn active" data-algo="caesar">Caesar</button>
+          <button class="algo-btn" data-algo="vigenere">Vigenère</button>
+          <button class="algo-btn" data-algo="rot13">ROT13</button>
+          <button class="algo-btn" data-algo="atbash">Atbash</button>
+          <button class="algo-btn" data-algo="substitution">Substitution</button>
+          <button class="algo-btn" data-algo="base64">Base64</button>
+        </div>
+
+        <div class="field" id="keySection">
+          <label for="keyInput">Key / Keyword</label>
+          <input id="keyInput" type="text" value="3" placeholder="Enter key or keyword..." />
+          <div id="keyNote" class="note">For Caesar: number 1-25. For Vigenère: any keyword.</div>
+        </div>
+
+        <div class="section-title">Input</div>
+        <div class="field">
+          <textarea id="inputText" placeholder="Paste or type your text here..."></textarea>
+        </div>
+
+        <div class="action-buttons">
+          <button class="primary" id="encryptButton">Encrypt</button>
+          <button class="primary" id="decryptButton">Decrypt</button>
+        </div>
+        <div class="action-buttons">
+          <button class="secondary" id="bruteforceButton" style="grid-column: 1;">Caesar Brute Force</button>
+          <button class="secondary" id="clearButton" style="grid-column: 2;">Clear All</button>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="output-card">
+          <div class="output-label">Encrypted Output</div>
+          <div class="output-text" id="encryptOutput"></div>
+          <button class="copy-button" id="copyEncrypt">Copy</button>
+        </div>
+
+        <div class="output-card">
+          <div class="output-label">Decrypted Output</div>
+          <div class="output-text" id="decryptOutput"></div>
+          <button class="copy-button" id="copyDecrypt">Copy</button>
+        </div>
+
+        <div id="bruteforceSection" style="display:none;">
+          <div class="output-label">Caesar Brute Force Results</div>
+          <div class="brute-list" id="bruteList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const inputText = document.getElementById('inputText');
+    const keyInput = document.getElementById('keyInput');
+    const keySection = document.getElementById('keySection');
+    const keyNote = document.getElementById('keyNote');
+    const encryptOutput = document.getElementById('encryptOutput');
+    const decryptOutput = document.getElementById('decryptOutput');
+    const bruteList = document.getElementById('bruteList');
+    const bruteSection = document.getElementById('bruteforceSection');
+    const encryptButton = document.getElementById('encryptButton');
+    const decryptButton = document.getElementById('decryptButton');
+    const bruteforceButton = document.getElementById('bruteforceButton');
+    const clearButton = document.getElementById('clearButton');
+    const algoButtons = document.querySelectorAll('.algo-btn');
+    const copyEncryptBtn = document.getElementById('copyEncrypt');
+    const copyDecryptBtn = document.getElementById('copyDecrypt');
+
+    let currentAlgo = 'caesar';
+
+    function updateAlgoButtons() {
+      algoButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.algo === currentAlgo);
+      });
+      updateKeyVisibility();
+    }
+
+    function updateKeyVisibility() {
+      if (currentAlgo === 'base64') {
+        keySection.style.display = 'none';
+      } else {
+        keySection.style.display = 'block';
+        const label = keySection.querySelector('label');
+        if (currentAlgo === 'caesar') {
+          label.textContent = 'Shift (1-25)';
+          keyInput.type = 'number';
+          keyInput.value = '3';
+          keyNote.textContent = 'Enter a number from 1 to 25.';
+        } else if (currentAlgo === 'vigenere') {
+          label.textContent = 'Keyword';
+          keyInput.type = 'text';
+          keyInput.value = 'KEY';
+          keyNote.textContent = 'Enter any word or phrase. Non-letters are ignored.';
+        } else if (currentAlgo === 'substitution') {
+          label.textContent = 'Alphabet';
+          keyInput.type = 'text';
+          keyInput.value = 'BCDEFGHIJKLMNOPQRSTUVWXYZA';
+          keyNote.textContent = 'Enter 26 unique letters for substitution alphabet.';
+        } else {
+          label.textContent = 'Key';
+          keyInput.type = 'text';
+          keyInput.value = '';
+          keyNote.textContent = '';
+        }
+      }
+    }
+
+    algoButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentAlgo = btn.dataset.algo;
+        updateAlgoButtons();
+      });
+    });
+
+    function caesarShift(text, shift) {
+      return text.replace(/[a-z]/gi, (char) => {
+        const code = char.charCodeAt(0);
+        const base = code >= 97 ? 97 : 65;
+        return String.fromCharCode(((code - base + shift + 26) % 26) + base);
+      });
+    }
+
+    function vigenereTransform(text, keyword, decrypt = false) {
+      const key = keyword.toUpperCase().replace(/[^A-Z]/g, '');
+      if (!key.length) return text;
+      let index = 0;
+      return text.replace(/[a-z]/gi, (char) => {
+        const code = char.charCodeAt(0);
+        const base = code >= 97 ? 97 : 65;
+        const shift = key.charCodeAt(index % key.length) - 65;
+        index += 1;
+        const offset = decrypt ? -shift : shift;
+        return String.fromCharCode(((code - base + offset + 26) % 26) + base);
+      });
+    }
+
+    function rot13(text) {
+      return caesarShift(text, 13);
+    }
+
+    function atbash(text) {
+      return text.replace(/[a-z]/gi, (char) => {
+        const code = char.charCodeAt(0);
+        const base = code >= 97 ? 97 : 65;
+        return String.fromCharCode(base + 25 - (code - base));
+      });
+    }
+
+    function substitutionCipher(text, alphabet, decrypt = false) {
+      if (alphabet.length < 26) return text;
+      const normalAlpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      let result = '';
+      for (let char of text) {
+        if (/[a-z]/i.test(char)) {
+          const idx = normalAlpha.indexOf(char.toUpperCase());
+          const newChar = decrypt ? normalAlpha[alphabet.toUpperCase().indexOf(char.toUpperCase())] : alphabet.toUpperCase()[idx];
+          result += /[a-z]/.test(char) ? newChar.toLowerCase() : newChar;
+        } else {
+          result += char;
+        }
+      }
+      return result;
+    }
+
+    function base64Encode(text) {
+      try {
+        return btoa(unescape(encodeURIComponent(text)));
+      } catch (e) {
+        return 'Error encoding';
+      }
+    }
+
+    function base64Decode(text) {
+      try {
+        return decodeURIComponent(escape(atob(text)));
+      } catch (e) {
+        return 'Error decoding';
+      }
+    }
+
+    function encrypt() {
+      const text = inputText.value;
+      if (!text) return;
+      let result = '';
+      if (currentAlgo === 'caesar') {
+        const shift = parseInt(keyInput.value, 10) || 0;
+        result = caesarShift(text, shift);
+      } else if (currentAlgo === 'vigenere') {
+        result = vigenereTransform(text, keyInput.value, false);
+      } else if (currentAlgo === 'rot13') {
+        result = rot13(text);
+      } else if (currentAlgo === 'atbash') {
+        result = atbash(text);
+      } else if (currentAlgo === 'substitution') {
+        result = substitutionCipher(text, keyInput.value, false);
+      } else if (currentAlgo === 'base64') {
+        result = base64Encode(text);
+      }
+      encryptOutput.textContent = result;
+      bruteSection.style.display = 'none';
+    }
+
+    function decrypt() {
+      const text = inputText.value;
+      if (!text) return;
+      let result = '';
+      if (currentAlgo === 'caesar') {
+        const shift = parseInt(keyInput.value, 10) || 0;
+        result = caesarShift(text, -shift);
+      } else if (currentAlgo === 'vigenere') {
+        result = vigenereTransform(text, keyInput.value, true);
+      } else if (currentAlgo === 'rot13') {
+        result = rot13(text);
+      } else if (currentAlgo === 'atbash') {
+        result = atbash(text);
+      } else if (currentAlgo === 'substitution') {
+        result = substitutionCipher(text, keyInput.value, true);
+      } else if (currentAlgo === 'base64') {
+        result = base64Decode(text);
+      }
+      decryptOutput.textContent = result;
+      bruteSection.style.display = 'none';
+    }
+
+    function bruteForce() {
+      if (currentAlgo !== 'caesar') {
+        bruteList.innerHTML = '<div class="brute-item">Brute force only works with Caesar cipher.</div>';
+        bruteSection.style.display = 'block';
+        return;
+      }
+      const text = inputText.value;
+      if (!text) return;
+      bruteList.innerHTML = '';
+      for (let shift = 1; shift < 26; shift += 1) {
+        const result = caesarShift(text, -shift);
+        const item = document.createElement('div');
+        item.className = 'brute-item';
+        item.textContent = `Shift ${shift}: ${result}`;
+        bruteList.appendChild(item);
+      }
+      bruteSection.style.display = 'block';
+    }
+
+    encryptButton.addEventListener('click', encrypt);
+    decryptButton.addEventListener('click', decrypt);
+    bruteforceButton.addEventListener('click', bruteForce);
+    clearButton.addEventListener('click', () => {
+      inputText.value = '';
+      encryptOutput.textContent = '';
+      decryptOutput.textContent = '';
+      bruteList.innerHTML = '';
+      bruteSection.style.display = 'none';
+    });
+
+    copyEncryptBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(encryptOutput.textContent).then(() => {
+        copyEncryptBtn.textContent = 'Copied!';
+        setTimeout(() => { copyEncryptBtn.textContent = 'Copy'; }, 2000);
+      });
+    });
+
+    copyDecryptBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(decryptOutput.textContent).then(() => {
+        copyDecryptBtn.textContent = 'Copied!';
+        setTimeout(() => { copyDecryptBtn.textContent = 'Copy'; }, 2000);
+      });
+    });
+
+    updateKeyVisibility();
+  </script>
+</body>
+</html>
