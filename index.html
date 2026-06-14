@@ -3,27 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cipher Studio</title>
+  <title>Bricy's Hub</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
       display: flex;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      justify-content: center;
       background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
       color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .app {
       width: 100%;
       max-width: 1200px;
-      margin: 0 auto;
       padding: 28px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 24px;
     }
     header {
       text-align: center;
@@ -50,15 +48,123 @@
       pointer-events: none;
       text-shadow: 0 1px 6px rgba(0,0,0,0.25);
     }
-    header h1 span {
-      position: relative;
-      z-index: 1;
+    header h1 span { position: relative; z-index: 1; }
+    header p { margin: 8px 0 0; font-size: 1rem; opacity: 0.95; }
+
+    .hub-screen { display: grid; gap: 24px; }
+    .hub-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
-    header p {
-      margin: 8px 0 0;
-      font-size: 1rem;
-      opacity: 0.95;
+    .tool-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 22px;
+      border-radius: 18px;
+      border: 1px solid #333;
+      background: #16213e;
+      color: #e0e0e0;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      text-align: left;
+      min-height: 150px;
     }
+    .tool-card:hover {
+      transform: translateY(-2px);
+      border-color: #7a7a7a;
+      background: #1c2841;
+    }
+    .tool-card h2 { margin: 0 0 10px; font-size: 1.2rem; color: #fff; }
+    .tool-card p { margin: 0; color: #b0b0b0; line-height: 1.5; }
+
+    .tool-screen { display: block; }
+    .login-screen {
+      display: grid;
+      gap: 24px;
+    }
+    .auth-card {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 28px;
+      border-radius: 18px;
+      border: 1px solid #333;
+      background: #16213e;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .auth-card h2 {
+      margin: 0 0 10px;
+      color: #fff;
+    }
+    .auth-card p {
+      margin: 0 0 22px;
+      color: #b0b0b0;
+      line-height: 1.6;
+    }
+    .auth-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid #333;
+      background: #0f0f1e;
+      color: #e0e0e0;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .auth-tab.active {
+      background: #7a7a7a;
+      border-color: #7a7a7a;
+      color: #000;
+    }
+    .auth-form {
+      display: grid;
+      gap: 16px;
+    }
+    .auth-input {
+      width: 100%;
+      border-radius: 10px;
+      border: 2px solid #333;
+      background: #0f0f1e;
+      color: #e0e0e0;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+    }
+    .auth-status {
+      color: #f0b4b4;
+      min-height: 1.4em;
+    }
+    .auth-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .auth-row button {
+      flex: 1;
+      min-width: 140px;
+    }
+    .hub-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+    }
+    .tool-screen { display: block; }
+    .tool-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .hidden { display: none !important; }
     .main {
       background: #1a1a2e;
       border-radius: 16px;
@@ -68,18 +174,8 @@
       grid-template-columns: 1fr 1fr;
       gap: 0;
     }
-    .left-panel {
-      padding: 28px;
-      border-right: 1px solid #333;
-      background: #16213e;
-    }
-    .right-panel {
-      padding: 28px;
-      background: #1a1a2e;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+    .left-panel { padding: 28px; border-right: 1px solid #333; background: #16213e; }
+    .right-panel { padding: 28px; background: #1a1a2e; display: flex; flex-direction: column; gap: 16px; }
     .section-title {
       font-size: 0.85rem;
       font-weight: 700;
@@ -90,20 +186,9 @@
       padding-bottom: 8px;
       border-bottom: 2px solid #7a7a7a;
     }
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-    label {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #e0e0e0;
-    }
-    textarea,
-    input,
-    select {
+    .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+    label { font-size: 0.95rem; font-weight: 600; color: #e0e0e0; }
+    textarea, input, select {
       width: 100%;
       border-radius: 10px;
       border: 2px solid #333;
@@ -114,23 +199,9 @@
       font-family: inherit;
       transition: border-color 0.2s ease;
     }
-    textarea,
-    input,
-    select:focus {
-      border-color: #7a7a7a;
-      outline: none;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 120px;
-      font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace;
-    }
-    .algo-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
+    textarea, input, select:focus { border-color: #7a7a7a; outline: none; }
+    textarea { resize: vertical; min-height: 120px; font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace; }
+    .algo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
     .algo-btn {
       padding: 10px 12px;
       border-radius: 8px;
@@ -143,21 +214,9 @@
       transition: all 0.2s ease;
       text-align: center;
     }
-    .algo-btn:hover {
-      border-color: #7a7a7a;
-      background: #1a2a4e;
-    }
-    .algo-btn.active {
-      background: #7a7a7a;
-      color: #000;
-      border-color: #7a7a7a;
-    }
-    .action-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 20px;
-    }
+    .algo-btn:hover { border-color: #7a7a7a; background: #1a2a4e; }
+    .algo-btn.active { background: #7a7a7a; color: #000; border-color: #7a7a7a; }
+    .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
     button.primary {
       background: #7a7a7a;
       color: #000;
@@ -185,10 +244,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    button.secondary:hover {
-      background: #3a4a6a;
-      border-color: #7a7a7a;
-    }
+    button.secondary:hover { background: #3a4a6a; border-color: #7a7a7a; }
     .output-card {
       background: #0f0f1e;
       border: 2px solid #333;
@@ -235,14 +291,8 @@
       font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace;
       color: #e0e0e0;
     }
-    .brute-item:last-child {
-      border-bottom: none;
-    }
-    .note {
-      font-size: 0.85rem;
-      color: #999;
-      margin-top: -4px;
-    }
+    .brute-item:last-child { border-bottom: none; }
+    .note { font-size: 0.85rem; color: #999; margin-top: -4px; }
     .copy-button {
       align-self: flex-end;
       background: #7a7a7a;
@@ -255,93 +305,118 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    .copy-button:hover {
-      background: #8a8a8a;
-    }
+    .copy-button:hover { background: #8a8a8a; }
     @media (max-width: 1000px) {
-      .main {
-        grid-template-columns: 1fr;
-      }
-      .left-panel {
-        border-right: none;
-        border-bottom: 1px solid #333;
-      }
-      .algo-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
+      .main { grid-template-columns: 1fr; }
+      .left-panel { border-right: none; border-bottom: 1px solid #333; }
+      .algo-grid { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 600px) {
-      .app {
-        padding: 16px;
-      }
-      header h1 {
-        font-size: 1.8rem;
-      }
-      .algo-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-      .left-panel,
-      .right-panel {
-        padding: 18px;
-      }
+      .app { padding: 16px; }
+      header h1 { font-size: 1.8rem; }
+      .algo-grid { grid-template-columns: 1fr 1fr; }
+      .left-panel, .right-panel { padding: 18px; }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <header>
-      <h1><span class="backdrop-text">bricy's</span><span>🔐 Cipher Studio</span></h1>
-      <p>Encode, decode, and analyze text with multiple cipher algorithms</p>
-    </header>
-    <div class="main">
-      <div class="left-panel">
-        <div class="section-title">Algorithm</div>
-        <div class="algo-grid">
-          <button class="algo-btn active" data-algo="caesar">Caesar</button>
-          <button class="algo-btn" data-algo="vigenere">Vigenère</button>
-          <button class="algo-btn" data-algo="rot13">ROT13</button>
-          <button class="algo-btn" data-algo="atbash">Atbash</button>
-          <button class="algo-btn" data-algo="substitution">Substitution</button>
-          <button class="algo-btn" data-algo="base64">Base64</button>
+    <div class="login-screen">
+      <header>
+        <h1>Bricy's Hub</h1>
+        <p>Sign in or create an account to unlock the tools.</p>
+      </header>
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="loginTab">Sign in</button>
+          <button class="auth-tab" id="signupTab">Sign up</button>
         </div>
-
-        <div class="field" id="keySection">
-          <label for="keyInput">Key / Keyword</label>
-          <input id="keyInput" type="text" value="3" placeholder="Enter key or keyword..." />
-          <div id="keyNote" class="note">For Caesar: number 1-25. For Vigenère: any keyword.</div>
-        </div>
-
-        <div class="section-title">Input</div>
-        <div class="field">
-          <textarea id="inputText" placeholder="Paste or type your text here..."></textarea>
-        </div>
-
-        <div class="action-buttons">
-          <button class="primary" id="encryptButton">Encrypt</button>
-          <button class="primary" id="decryptButton">Decrypt</button>
-        </div>
-        <div class="action-buttons">
-          <button class="secondary" id="bruteforceButton" style="grid-column: 1;">Caesar Brute Force</button>
-          <button class="secondary" id="clearButton" style="grid-column: 2;">Clear All</button>
-        </div>
+        <form class="auth-form" id="authForm">
+          <input id="authUsername" class="auth-input" type="text" placeholder="Username" autocomplete="username" required />
+          <input id="authPassword" class="auth-input" type="password" placeholder="Password" autocomplete="current-password" required />
+          <div class="auth-status" id="authStatus"></div>
+          <div class="auth-row">
+            <button class="primary" id="authSubmit" type="submit">Sign in</button>
+            <button class="secondary" type="button" id="authToggle">Switch to Sign up</button>
+          </div>
+        </form>
       </div>
+    </div>
 
-      <div class="right-panel">
-        <div class="output-card">
-          <div class="output-label">Encrypted Output</div>
-          <div class="output-text" id="encryptOutput"></div>
-          <button class="copy-button" id="copyEncrypt">Copy</button>
+    <div class="hub-screen hidden">
+      <header>
+        <h1>Bricy's Hub</h1>
+        <p id="hubWelcome">Choose a tool to launch. More projects will be added here over time.</p>
+      </header>
+      <div class="hub-actions">
+        <button class="secondary" id="logoutButton">Logout</button>
+      </div>
+      <div class="hub-grid">
+        <button class="tool-card" data-tool="cipher">
+          <h2>Cipher Studio</h2>
+          <p>Encrypt, decrypt, and analyze text with multiple cipher algorithms.</p>
+        </button>
+      </div>
+    </div>
+
+    <div class="tool-screen hidden">
+      <div class="tool-header">
+        <div>
+          <h1><span class="backdrop-text">Bricy's</span><span id="toolTitle">🔐 Cipher Studio</span></h1>
+          <p id="toolDesc">Encode, decode, and analyze text with multiple cipher algorithms</p>
+        </div>
+        <button class="secondary" id="backButton">← Back to Hub</button>
+      </div>
+      <div class="main">
+        <div class="left-panel">
+          <div class="section-title">Algorithm</div>
+          <div class="algo-grid">
+            <button class="algo-btn active" data-algo="caesar">Caesar</button>
+            <button class="algo-btn" data-algo="vigenere">Vigenère</button>
+            <button class="algo-btn" data-algo="rot13">ROT13</button>
+            <button class="algo-btn" data-algo="atbash">Atbash</button>
+            <button class="algo-btn" data-algo="substitution">Substitution</button>
+            <button class="algo-btn" data-algo="base64">Base64</button>
+          </div>
+
+          <div class="field" id="keySection">
+            <label for="keyInput">Key / Keyword</label>
+            <input id="keyInput" type="text" value="3" placeholder="Enter key or keyword..." />
+            <div id="keyNote" class="note">For Caesar: number 1-25. For Vigenère: any keyword.</div>
+          </div>
+
+          <div class="section-title">Input</div>
+          <div class="field">
+            <textarea id="inputText" placeholder="Paste or type your text here..."></textarea>
+          </div>
+
+          <div class="action-buttons">
+            <button class="primary" id="encryptButton">Encrypt</button>
+            <button class="primary" id="decryptButton">Decrypt</button>
+          </div>
+          <div class="action-buttons">
+            <button class="secondary" id="bruteforceButton" style="grid-column: 1;">Caesar Brute Force</button>
+            <button class="secondary" id="clearButton" style="grid-column: 2;">Clear All</button>
+          </div>
         </div>
 
-        <div class="output-card">
-          <div class="output-label">Decrypted Output</div>
-          <div class="output-text" id="decryptOutput"></div>
-          <button class="copy-button" id="copyDecrypt">Copy</button>
-        </div>
+        <div class="right-panel">
+          <div class="output-card">
+            <div class="output-label">Encrypted Output</div>
+            <div class="output-text" id="encryptOutput"></div>
+            <button class="copy-button" id="copyEncrypt">Copy</button>
+          </div>
 
-        <div id="bruteforceSection" style="display:none;">
-          <div class="output-label">Caesar Brute Force Results</div>
-          <div class="brute-list" id="bruteList"></div>
+          <div class="output-card">
+            <div class="output-label">Decrypted Output</div>
+            <div class="output-text" id="decryptOutput"></div>
+            <button class="copy-button" id="copyDecrypt">Copy</button>
+          </div>
+
+          <div id="bruteforceSection" style="display:none;">
+            <div class="output-label">Caesar Brute Force Results</div>
+            <div class="brute-list" id="bruteList"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -361,8 +436,130 @@
     const bruteforceButton = document.getElementById('bruteforceButton');
     const clearButton = document.getElementById('clearButton');
     const algoButtons = document.querySelectorAll('.algo-btn');
+    const toolCards = document.querySelectorAll('.tool-card');
+    const hubScreen = document.querySelector('.hub-screen');
+    const toolScreen = document.querySelector('.tool-screen');
+    const loginScreen = document.querySelector('.login-screen');
+    const authForm = document.getElementById('authForm');
+    const authUsername = document.getElementById('authUsername');
+    const authPassword = document.getElementById('authPassword');
+    const authStatus = document.getElementById('authStatus');
+    const authToggle = document.getElementById('authToggle');
+    const loginTab = document.getElementById('loginTab');
+    const signupTab = document.getElementById('signupTab');
+    const authSubmit = document.getElementById('authSubmit');
+    const logoutButton = document.getElementById('logoutButton');
+    const hubWelcome = document.getElementById('hubWelcome');
+    const backButton = document.getElementById('backButton');
+    const toolTitle = document.getElementById('toolTitle');
+    const toolDesc = document.getElementById('toolDesc');
     const copyEncryptBtn = document.getElementById('copyEncrypt');
     const copyDecryptBtn = document.getElementById('copyDecrypt');
+    const currentUser = localStorage.getItem('currentUser');
+
+    let authMode = 'login';
+
+    function showHub() {
+      loginScreen.classList.add('hidden');
+      toolScreen.classList.add('hidden');
+      hubScreen.classList.remove('hidden');
+    }
+
+    function selectTool(toolName) {
+      if (toolName !== 'cipher') return;
+      hubScreen.classList.add('hidden');
+      toolScreen.classList.remove('hidden');
+      toolTitle.textContent = '🔐 Cipher Studio';
+      toolDesc.textContent = 'Encode, decode, and analyze text with multiple cipher algorithms';
+    }
+
+    function setAuthMode(mode) {
+      authMode = mode;
+      loginTab.classList.toggle('active', mode === 'login');
+      signupTab.classList.toggle('active', mode === 'signup');
+      authSubmit.textContent = mode === 'login' ? 'Sign in' : 'Sign up';
+      authToggle.textContent = mode === 'login' ? 'Switch to Sign up' : 'Switch to Sign in';
+      authStatus.textContent = '';
+    }
+
+    function loadUsers() {
+      return JSON.parse(localStorage.getItem('userDB') || '{}');
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem('userDB', JSON.stringify(users));
+    }
+
+    function loginUser(username) {
+      localStorage.setItem('currentUser', username);
+      loginScreen.classList.add('hidden');
+      hubScreen.classList.remove('hidden');
+      hubWelcome.textContent = `Welcome, ${username}! Choose a tool to launch.`;
+      authStatus.textContent = '';
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('currentUser');
+      loginScreen.classList.remove('hidden');
+      hubScreen.classList.add('hidden');
+      toolScreen.classList.add('hidden');
+      setAuthMode('login');
+    }
+
+    function handleAuthSubmit(event) {
+      event.preventDefault();
+      const username = authUsername.value.trim();
+      const password = authPassword.value.trim();
+      if (!username || !password) {
+        authStatus.textContent = 'Enter both username and password.';
+        return;
+      }
+      const users = loadUsers();
+      if (authMode === 'login') {
+        if (!users[username] || users[username] !== password) {
+          authStatus.textContent = 'Invalid username or password.';
+          return;
+        }
+        loginUser(username);
+      } else {
+        if (users[username]) {
+          authStatus.textContent = 'Username already exists.';
+          return;
+        }
+        users[username] = password;
+        saveUsers(users);
+        loginUser(username);
+      }
+    }
+
+    function initializeAuth() {
+      if (currentUser) {
+        loginScreen.classList.add('hidden');
+        hubScreen.classList.remove('hidden');
+      } else {
+        loginScreen.classList.remove('hidden');
+        hubScreen.classList.add('hidden');
+      }
+      setAuthMode('login');
+    }
+
+    toolCards.forEach(card => {
+      card.addEventListener('click', () => selectTool(card.dataset.tool));
+    });
+
+    authForm.addEventListener('submit', handleAuthSubmit);
+    authToggle.addEventListener('click', () => setAuthMode(authMode === 'login' ? 'signup' : 'login'));
+    loginTab.addEventListener('click', () => setAuthMode('login'));
+    signupTab.addEventListener('click', () => setAuthMode('signup'));
+    logoutButton.addEventListener('click', logoutUser);
+    backButton.addEventListener('click', showHub);
+    document.addEventListener('keydown', event => {
+      if ((event.key === 'ArrowLeft' || event.key === 'Escape') && !toolScreen.classList.contains('hidden')) {
+        showHub();
+      }
+    });
+
+    initializeAuth();
 
     let currentAlgo = 'caesar';
 
@@ -411,7 +608,7 @@
     });
 
     function caesarShift(text, shift) {
-      return text.replace(/[a-z]/gi, (char) => {
+      return text.replace(/[a-z]/gi, char => {
         const code = char.charCodeAt(0);
         const base = code >= 97 ? 97 : 65;
         return String.fromCharCode(((code - base + shift + 26) % 26) + base);
@@ -422,7 +619,7 @@
       const key = keyword.toUpperCase().replace(/[^A-Z]/g, '');
       if (!key.length) return text;
       let index = 0;
-      return text.replace(/[a-z]/gi, (char) => {
+      return text.replace(/[a-z]/gi, char => {
         const code = char.charCodeAt(0);
         const base = code >= 97 ? 97 : 65;
         const shift = key.charCodeAt(index % key.length) - 65;
@@ -432,12 +629,9 @@
       });
     }
 
-    function rot13(text) {
-      return caesarShift(text, 13);
-    }
-
+    function rot13(text) { return caesarShift(text, 13); }
     function atbash(text) {
-      return text.replace(/[a-z]/gi, (char) => {
+      return text.replace(/[a-z]/gi, char => {
         const code = char.charCodeAt(0);
         const base = code >= 97 ? 97 : 65;
         return String.fromCharCode(base + 25 - (code - base));
@@ -451,7 +645,9 @@
       for (let char of text) {
         if (/[a-z]/i.test(char)) {
           const idx = normalAlpha.indexOf(char.toUpperCase());
-          const newChar = decrypt ? normalAlpha[alphabet.toUpperCase().indexOf(char.toUpperCase())] : alphabet.toUpperCase()[idx];
+          const newChar = decrypt
+            ? normalAlpha[alphabet.toUpperCase().indexOf(char.toUpperCase())]
+            : alphabet.toUpperCase()[idx];
           result += /[a-z]/.test(char) ? newChar.toLowerCase() : newChar;
         } else {
           result += char;
