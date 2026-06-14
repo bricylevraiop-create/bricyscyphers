@@ -267,17 +267,9 @@
           <h2>HTML File Builder</h2>
           <p>Create an .html file from raw HTML source and download it instantly.</p>
         </button>
-        <button class="tool-card" data-tool="mp4to3">
-          <h2>MP4 to MP3 Converter</h2>
-          <p>Extract audio from a local MP4 file and save it as MP3 if the browser supports it.</p>
-        </button>
-        <button class="tool-card" data-tool="ai">
-          <h2>Mini AI</h2>
-          <p>Small on-page assistant: ask simple questions, do quick calculations, or get a joke.</p>
-        </button>
-        <button class="tool-card" data-tool="browser">
-          <h2>My Own Browser</h2>
-          <p>Open a web page inside the hub using an iframe sandbox.</p>
+        <button class="tool-card" data-tool="tiktok">
+          <h2>TikTok Link Resolver</h2>
+          <p>Resolve a TikTok page URL to the video's direct media link (official URL).</p>
         </button>
       </div>
     </div>
@@ -367,6 +359,28 @@
         </div>
       </div>
     </div>
+    <div class="tiktok-panel hidden">
+      <div class="main">
+        <div class="left-panel">
+          <div class="section-title">TikTok URL</div>
+          <div class="field">
+            <input id="tiktokUrlInput" type="url" placeholder="https://www.tiktok.com/@user/video/123..." />
+          </div>
+          <div class="action-buttons">
+            <button class="primary" id="resolveTiktokBtn">Resolve Video Link</button>
+            <button class="secondary" id="clearTiktokBtn">Clear</button>
+          </div>
+          <div id="tiktokNote" class="note">Returns the official video URL provided by TikTok. Use only for content you own or have permission to use.</div>
+        </div>
+        <div class="right-panel">
+          <div class="output-card">
+            <div class="output-label">Resolved Video URL</div>
+            <div class="output-text" id="tiktokResult">No result yet.</div>
+            <button class="copy-button" id="copyTiktokLink">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="htmlbuilder-panel hidden">
       <div class="main">
         <div class="left-panel">
@@ -394,75 +408,29 @@
         </div>
       </div>
     </div>
-    <div class="mp4to3-panel hidden">
+    <div class="htmlbuilder-panel hidden">
       <div class="main">
         <div class="left-panel">
-          <div class="section-title">Select MP4 Video</div>
+          <div class="section-title">Raw HTML Source</div>
           <div class="field">
-            <input id="mp4Input" type="file" accept="video/mp4,video/*" />
+            <textarea id="htmlSourceInput" placeholder="Paste raw HTML here..."></textarea>
           </div>
           <div class="field">
-            <label for="mp3FilenameInput">Output File</label>
-            <input id="mp3FilenameInput" type="text" placeholder="audio.wav" />
+            <label for="htmlFilenameInput">File name</label>
+            <input id="htmlFilenameInput" type="text" placeholder="example.html" />
           </div>
           <div class="action-buttons">
-                  <button class="primary" id="convertMp4Button">Extract Audio</button>
-                  <button class="secondary" id="convertWasmButton">Convert in Browser</button>
-                  <button class="secondary" id="convertServerButton">Convert via Local Server</button>
-                  <button class="secondary" id="clearMp4Button">Clear</button>
-                </div>
-          <div id="mp4Status" class="note">This tool extracts audio from a local MP4 file. If MP3 is unavailable, it exports a VLC-compatible WAV file.</div>
+            <button class="primary" id="generateHtmlButton">Create HTML File</button>
+            <button class="secondary" id="clearHtmlButton">Clear</button>
+          </div>
+          <div id="htmlStatus" class="note">This tool packages raw HTML into a downloadable .html file.</div>
         </div>
         <div class="right-panel">
           <div class="output-card">
-            <div class="output-label">Download Audio</div>
-            <div class="output-text" id="mp4AudioOutputWrapper" style="display:flex;justify-content:center;align-items:center;min-height:320px;">
-              <a id="mp4DownloadLink" href="#" style="display:none;color:#7a7a7a;text-decoration:underline;" download>Download MP3</a>
+            <div class="output-label">Download Link</div>
+            <div class="output-text" id="htmlDownloadWrapper" style="display:flex;justify-content:center;align-items:center;min-height:320px;">
+              <a id="htmlDownloadLink" href="#" style="display:none;color:#7a7a7a;text-decoration:underline;" download>Download HTML File</a>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="ai-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">Mini AI</div>
-          <div class="field">
-            <label for="aiInput">Ask the mini AI</label>
-            <input id="aiInput" type="text" placeholder="Type a question, 'time', 'joke', or a math expression" />
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="aiSendButton">Send</button>
-            <button class="secondary" id="aiClearButton">Clear</button>
-          </div>
-          <div id="aiStatus" class="note">This is a small rule-based assistant that runs entirely in your browser.</div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Conversation</div>
-            <div class="output-text" id="aiOutput" style="min-height:320px;"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="browser-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">My Own Browser</div>
-          <div class="field">
-            <label for="browserUrlInput">URL</label>
-            <input id="browserUrlInput" type="url" placeholder="https://example.com" />
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="openBrowserButton">Open</button>
-            <button class="secondary" id="clearBrowserButton">Clear</button>
-          </div>
-          <div id="browserStatus" class="note">Enter a URL to open it safely inside the embedded browser frame.</div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card" style="min-height:320px;">
-            <div class="output-label">Browser View</div>
-            <iframe id="browserFrame" sandbox="allow-scripts allow-same-origin allow-forms" src="about:blank" style="width:100%;height:100%;border:1px solid #333;border-radius:10px;background:#000;"></iframe>
           </div>
         </div>
       </div>
@@ -503,26 +471,15 @@
     const clearHtmlButton = document.getElementById('clearHtmlButton');
     const htmlStatus = document.getElementById('htmlStatus');
     const htmlDownloadLink = document.getElementById('htmlDownloadLink');
+    const tiktokPanel = document.querySelector('.tiktok-panel');
+    const tiktokUrlInput = document.getElementById('tiktokUrlInput');
+    const resolveTiktokBtn = document.getElementById('resolveTiktokBtn');
+    const clearTiktokBtn = document.getElementById('clearTiktokBtn');
+    const tiktokResult = document.getElementById('tiktokResult');
+    const copyTiktokLink = document.getElementById('copyTiktokLink');
+    const API_BASE = 'http://localhost:3000';
     const mp4Input = document.getElementById('mp4Input');
     const mp3FilenameInput = document.getElementById('mp3FilenameInput');
-    const convertMp4Button = document.getElementById('convertMp4Button');
-    const convertWasmButton = document.getElementById('convertWasmButton');
-    const convertServerButton = document.getElementById('convertServerButton');
-    const clearMp4Button = document.getElementById('clearMp4Button');
-    const mp4Status = document.getElementById('mp4Status');
-    const mp4DownloadLink = document.getElementById('mp4DownloadLink');
-    const aiPanel = document.querySelector('.ai-panel');
-    const aiInput = document.getElementById('aiInput');
-    const aiSendButton = document.getElementById('aiSendButton');
-    const aiClearButton = document.getElementById('aiClearButton');
-    const aiOutput = document.getElementById('aiOutput');
-    const aiStatus = document.getElementById('aiStatus');
-    const browserPanel = document.querySelector('.browser-panel');
-    const browserUrlInput = document.getElementById('browserUrlInput');
-    const openBrowserButton = document.getElementById('openBrowserButton');
-    const clearBrowserButton = document.getElementById('clearBrowserButton');
-    const browserStatus = document.getElementById('browserStatus');
-    const browserFrame = document.getElementById('browserFrame');
     const copyEncryptBtn = document.getElementById('copyEncrypt');
     const copyDecryptBtn = document.getElementById('copyDecrypt');
 
@@ -536,21 +493,16 @@
       qrPanel.classList.add('hidden');
       const htmlbuilderPanel = document.querySelector('.htmlbuilder-panel');
       htmlbuilderPanel.classList.add('hidden');
-      const mp4to3Panel = document.querySelector('.mp4to3-panel');
-      mp4to3Panel.classList.add('hidden');
+      if (tiktokPanel) tiktokPanel.classList.add('hidden');
       
       if (toolName === 'cipher') {
         cipherPanel.classList.remove('hidden');
       } else if (toolName === 'qr') {
         qrPanel.classList.remove('hidden');
+      } else if (toolName === 'tiktok') {
+        if (tiktokPanel) tiktokPanel.classList.remove('hidden');
       } else if (toolName === 'htmlbuilder') {
         htmlbuilderPanel.classList.remove('hidden');
-      } else if (toolName === 'mp4to3') {
-        mp4to3Panel.classList.remove('hidden');
-      } else if (toolName === 'ai') {
-        aiPanel.classList.remove('hidden');
-      } else if (toolName === 'browser') {
-        browserPanel.classList.remove('hidden');
       }
     }
 
@@ -566,15 +518,9 @@
       } else if (toolName === 'htmlbuilder') {
         toolTitle.textContent = '📝 HTML File Builder';
         toolDesc.textContent = 'Create a downloadable HTML file from raw HTML source.';
-      } else if (toolName === 'mp4to3') {
-        toolTitle.textContent = '🎵 MP4 to MP3 Converter';
-        toolDesc.textContent = 'Extract audio from a local MP4 file and save it as MP3.';
-      } else if (toolName === 'ai') {
-        toolTitle.textContent = '🤖 Mini AI';
-        toolDesc.textContent = 'A very small, local rule-based assistant running in your browser.';
-      } else if (toolName === 'browser') {
-        toolTitle.textContent = '🌐 My Own Browser';
-        toolDesc.textContent = 'Browse a website inside the hub using an embedded iframe.';
+      } else if (toolName === 'tiktok') {
+        toolTitle.textContent = '📹 TikTok Link Resolver';
+        toolDesc.textContent = 'Resolve a TikTok page to the official video media URL (watermark preserved).';
       }
       showToolPanel(toolName);
     }
@@ -1166,6 +1112,58 @@
       }
     });
 
+    function updateDesignerPreview() {
+      const html = designerSourceInput.value;
+      if (!html.trim()) {
+        designerPreviewFrame.srcdoc = '<!DOCTYPE html><html><body style="color:#777;font-family:sans-serif;padding:20px;"><p>Paste HTML to preview it here.</p></body></html>';
+        designerStatus.textContent = 'Paste HTML above to preview it live.';
+        return;
+      }
+      designerPreviewFrame.srcdoc = html;
+      designerStatus.textContent = 'Live preview updated.';
+    }
+
+    function insertDesignerSnippet(snippet) {
+      const textarea = designerSourceInput;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const before = textarea.value.slice(0, start);
+      const after = textarea.value.slice(end);
+      textarea.value = before + snippet + after;
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
+      updateDesignerPreview();
+    }
+
+    designerPreviewButton.addEventListener('click', updateDesignerPreview);
+    designerDownloadButton.addEventListener('click', () => {
+      const html = designerSourceInput.value;
+      if (!html.trim()) {
+        designerStatus.textContent = 'Write HTML before downloading.';
+        return;
+      }
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'designer.html';
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      setTimeout(() => { URL.revokeObjectURL(url); }, 1000);
+      designerStatus.textContent = 'Downloaded HTML file.';
+    });
+
+    designerClearButton.addEventListener('click', () => {
+      designerSourceInput.value = '';
+      updateDesignerPreview();
+      designerStatus.textContent = 'Cleared design canvas.';
+    });
+
+    document.querySelectorAll('.snippet-btn').forEach(button => {
+      button.addEventListener('click', () => insertDesignerSnippet(button.dataset.snippet));
+    });
+
     clearMp4Button.addEventListener('click', () => {
       mp4Input.value = '';
       mp3FilenameInput.value = '';
@@ -1384,6 +1382,57 @@
     });
 
     updateKeyVisibility();
+
+    // TikTok resolver
+    if (resolveTiktokBtn) {
+      resolveTiktokBtn.addEventListener('click', async () => {
+        const url = (tiktokUrlInput && tiktokUrlInput.value || '').trim();
+        if (!url) {
+          tiktokResult.textContent = 'Enter a TikTok page URL first.';
+          return;
+        }
+        tiktokResult.textContent = 'Resolving...';
+        try {
+          const resp = await fetch(`${API_BASE}/api/get-video`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+          });
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            tiktokResult.textContent = err.error || `Server returned ${resp.status}`;
+            return;
+          }
+          const data = await resp.json();
+          if (data.video) {
+            tiktokResult.textContent = data.video;
+          } else {
+            tiktokResult.textContent = 'Video link not found.';
+          }
+        } catch (e) {
+          tiktokResult.textContent = 'Could not reach resolver server.';
+          console.error(e);
+        }
+      });
+    }
+
+    if (clearTiktokBtn) {
+      clearTiktokBtn.addEventListener('click', () => {
+        if (tiktokUrlInput) tiktokUrlInput.value = '';
+        if (tiktokResult) tiktokResult.textContent = 'No result yet.';
+      });
+    }
+
+    if (copyTiktokLink) {
+      copyTiktokLink.addEventListener('click', () => {
+        const text = tiktokResult.textContent || '';
+        if (!text || text === 'No result yet.' || text.startsWith('Enter')) return;
+        navigator.clipboard.writeText(text).then(() => {
+          copyTiktokLink.textContent = 'Copied!';
+          setTimeout(() => { copyTiktokLink.textContent = 'Copy'; }, 2000);
+        });
+      });
+    }
   </script>
 </body>
 </html>
