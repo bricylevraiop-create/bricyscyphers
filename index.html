@@ -267,9 +267,29 @@
           <h2>HTML File Builder</h2>
           <p>Create an .html file from raw HTML source and download it instantly.</p>
         </button>
-        <button class="tool-card" data-tool="tiktok">
-          <h2>TikTok Link Resolver</h2>
-          <p>Resolve a TikTok page URL to the video's direct media link (official URL).</p>
+        <button class="tool-card" data-tool="json">
+          <h2>JSON Formatter</h2>
+          <p>Validate and pretty-print JSON, and minify for compact output.</p>
+        </button>
+        <button class="tool-card" data-tool="image">
+          <h2>Image Resizer</h2>
+          <p>Resize an image client-side and download the result.</p>
+        </button>
+        <button class="tool-card" data-tool="password">
+          <h2>Password Generator</h2>
+          <p>Create strong, customizable passwords instantly.</p>
+        </button>
+        <button class="tool-card" data-tool="urltools">
+          <h2>URL Encoder/Decoder</h2>
+          <p>Encode or decode URL components safely.</p>
+        </button>
+        <button class="tool-card" data-tool="colors">
+          <h2>Color Extractor</h2>
+          <p>Extract dominant colors from an image and copy hex values.</p>
+        </button>
+        <button class="tool-card" data-tool="messenger">
+          <h2>Messenger</h2>
+          <p>Login and view only your account messages.</p>
         </button>
       </div>
     </div>
@@ -359,24 +379,120 @@
         </div>
       </div>
     </div>
-    <div class="tiktok-panel hidden">
+    <div class="json-panel hidden">
       <div class="main">
         <div class="left-panel">
-          <div class="section-title">TikTok URL</div>
+          <div class="section-title">JSON Input</div>
           <div class="field">
-            <input id="tiktokUrlInput" type="url" placeholder="https://www.tiktok.com/@user/video/123..." />
+            <textarea id="jsonInput" placeholder='Paste JSON here...'></textarea>
           </div>
           <div class="action-buttons">
-            <button class="primary" id="resolveTiktokBtn">Resolve Video Link</button>
-            <button class="secondary" id="clearTiktokBtn">Clear</button>
+            <button class="primary" id="formatJsonBtn">Format</button>
+            <button class="secondary" id="minifyJsonBtn">Minify</button>
           </div>
-          <div id="tiktokNote" class="note">Returns the official video URL provided by TikTok. Use only for content you own or have permission to use.</div>
         </div>
         <div class="right-panel">
           <div class="output-card">
-            <div class="output-label">Resolved Video URL</div>
-            <div class="output-text" id="tiktokResult">No result yet.</div>
-            <button class="copy-button" id="copyTiktokLink">Copy</button>
+            <div class="output-label">Output</div>
+            <div class="output-text" id="jsonOutput">No result yet.</div>
+            <button class="copy-button" id="copyJsonBtn">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="image-panel hidden">
+      <div class="main">
+        <div class="left-panel">
+          <div class="section-title">Image Resizer</div>
+          <div class="field">
+            <input id="imageInput" type="file" accept="image/*" />
+            <label>Width (px)</label>
+            <input id="imageWidth" type="number" placeholder="e.g. 800" />
+            <label>Height (px, optional)</label>
+            <input id="imageHeight" type="number" placeholder="leave blank to preserve aspect" />
+          </div>
+          <div class="action-buttons">
+            <button class="primary" id="resizeImageBtn">Resize & Download</button>
+            <button class="secondary" id="clearImageBtn">Clear</button>
+          </div>
+        </div>
+        <div class="right-panel">
+          <div class="output-card">
+            <div class="output-label">Preview</div>
+            <div class="output-text" id="imagePreviewWrapper" style="display:flex;justify-content:center;align-items:center;min-height:240px;">
+              <img id="imagePreview" style="max-width:100%;height:auto;display:none;border-radius:8px;" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="password-panel hidden">
+      <div class="main">
+        <div class="left-panel">
+          <div class="section-title">Password Generator</div>
+          <div class="field">
+            <label>Length</label>
+            <input id="pwLength" type="number" value="16" min="4" max="128" />
+            <label><input id="pwLower" type="checkbox" checked /> Include lowercase</label>
+            <label><input id="pwUpper" type="checkbox" checked /> Include UPPERCASE</label>
+            <label><input id="pwNumbers" type="checkbox" checked /> Include numbers</label>
+            <label><input id="pwSymbols" type="checkbox" /> Include symbols</label>
+          </div>
+          <div class="action-buttons">
+            <button class="primary" id="genPwBtn">Generate</button>
+            <button class="secondary" id="clearPwBtn">Clear</button>
+          </div>
+        </div>
+        <div class="right-panel">
+          <div class="output-card">
+            <div class="output-label">Password</div>
+            <div class="output-text" id="pwOutput">No password yet.</div>
+            <button class="copy-button" id="copyPwBtn">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="urltools-panel hidden">
+      <div class="main">
+        <div class="left-panel">
+          <div class="section-title">URL Encode / Decode</div>
+          <div class="field">
+            <input id="urlToolInput" type="text" placeholder="Enter text or URL component" />
+          </div>
+          <div class="action-buttons">
+            <button class="primary" id="encodeUrlBtn">Encode</button>
+            <button class="secondary" id="decodeUrlBtn">Decode</button>
+          </div>
+        </div>
+        <div class="right-panel">
+          <div class="output-card">
+            <div class="output-label">Result</div>
+            <div class="output-text" id="urlToolResult">No result yet.</div>
+            <button class="copy-button" id="copyUrlToolBtn">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="colors-panel hidden">
+      <div class="main">
+        <div class="left-panel">
+          <div class="section-title">Color Extractor</div>
+          <div class="field">
+            <input id="colorImageInput" type="file" accept="image/*" />
+          </div>
+          <div class="action-buttons">
+            <button class="primary" id="extractColorsBtn">Extract Colors</button>
+            <button class="secondary" id="clearColorsBtn">Clear</button>
+          </div>
+        </div>
+        <div class="right-panel">
+          <div class="output-card">
+            <div class="output-label">Palette</div>
+            <div class="output-text" id="colorPalette" style="display:flex;gap:8px;flex-wrap:wrap;min-height:120px;align-items:center;">No colors yet.</div>
           </div>
         </div>
       </div>
@@ -408,31 +524,52 @@
         </div>
       </div>
     </div>
-    <div class="htmlbuilder-panel hidden">
+
+    <div class="messenger-panel hidden">
       <div class="main">
         <div class="left-panel">
-          <div class="section-title">Raw HTML Source</div>
+          <div class="section-title">Messenger Login</div>
           <div class="field">
-            <textarea id="htmlSourceInput" placeholder="Paste raw HTML here..."></textarea>
+            <label for="messengerUsernameInput">Username</label>
+            <input id="messengerUsernameInput" type="text" placeholder="Enter your username" />
           </div>
           <div class="field">
-            <label for="htmlFilenameInput">File name</label>
-            <input id="htmlFilenameInput" type="text" placeholder="example.html" />
+            <label for="messengerPasswordInput">Password</label>
+            <input id="messengerPasswordInput" type="password" placeholder="Enter your password" />
           </div>
           <div class="action-buttons">
-            <button class="primary" id="generateHtmlButton">Create HTML File</button>
-            <button class="secondary" id="clearHtmlButton">Clear</button>
+            <button class="primary" id="messengerLoginButton">Login</button>
+            <button class="primary" id="messengerRegisterButton">Register</button>
           </div>
-          <div id="htmlStatus" class="note">This tool packages raw HTML into a downloadable .html file.</div>
+          <div class="action-buttons">
+            <button class="secondary" id="messengerLogoutButton">Logout</button>
+          </div>
+          <div id="messengerStatus" class="note">Login is required to view and send messages.</div>
         </div>
         <div class="right-panel">
           <div class="output-card">
-            <div class="output-label">Download Link</div>
-            <div class="output-text" id="htmlDownloadWrapper" style="display:flex;justify-content:center;align-items:center;min-height:320px;">
-              <a id="htmlDownloadLink" href="#" style="display:none;color:#7a7a7a;text-decoration:underline;" download>Download HTML File</a>
+            <div class="output-label">Your Account</div>
+            <div class="output-text" id="messengerCurrentUserLabel">Not logged in.</div>
+          </div>
+          <div class="output-card">
+            <div class="output-label">Compose Message</div>
+            <div class="field">
+              <label for="messengerComposeTo">Send to</label>
+              <select id="messengerComposeTo"></select>
+            </div>
+            <div class="field">
+              <label for="messengerComposeText">Message</label>
+              <textarea id="messengerComposeText" placeholder="Type your message here..."></textarea>
+            </div>
+            <div class="action-buttons">
+              <button class="primary" id="messengerSendButton">Send</button>
             </div>
           </div>
         </div>
+      </div>
+      <div class="output-card" style="margin-top:16px;">
+        <div class="output-label">Inbox</div>
+        <div class="brute-list" id="messengerInboxList">Your messages will appear here after login.</div>
       </div>
     </div>
   </div>
@@ -471,15 +608,56 @@
     const clearHtmlButton = document.getElementById('clearHtmlButton');
     const htmlStatus = document.getElementById('htmlStatus');
     const htmlDownloadLink = document.getElementById('htmlDownloadLink');
-    const tiktokPanel = document.querySelector('.tiktok-panel');
-    const tiktokUrlInput = document.getElementById('tiktokUrlInput');
-    const resolveTiktokBtn = document.getElementById('resolveTiktokBtn');
-    const clearTiktokBtn = document.getElementById('clearTiktokBtn');
-    const tiktokResult = document.getElementById('tiktokResult');
-    const copyTiktokLink = document.getElementById('copyTiktokLink');
-    const API_BASE = 'http://localhost:3000';
-    const mp4Input = document.getElementById('mp4Input');
-    const mp3FilenameInput = document.getElementById('mp3FilenameInput');
+    const jsonPanel = document.querySelector('.json-panel');
+    const jsonInput = document.getElementById('jsonInput');
+    const formatJsonBtn = document.getElementById('formatJsonBtn');
+    const minifyJsonBtn = document.getElementById('minifyJsonBtn');
+    const jsonOutput = document.getElementById('jsonOutput');
+    const copyJsonBtn = document.getElementById('copyJsonBtn');
+
+    const imagePanel = document.querySelector('.image-panel');
+    const imageInput = document.getElementById('imageInput');
+    const imageWidth = document.getElementById('imageWidth');
+    const imageHeight = document.getElementById('imageHeight');
+    const resizeImageBtn = document.getElementById('resizeImageBtn');
+    const clearImageBtn = document.getElementById('clearImageBtn');
+    const imagePreview = document.getElementById('imagePreview');
+
+    const passwordPanel = document.querySelector('.password-panel');
+    const pwLength = document.getElementById('pwLength');
+    const pwLower = document.getElementById('pwLower');
+    const pwUpper = document.getElementById('pwUpper');
+    const pwNumbers = document.getElementById('pwNumbers');
+    const pwSymbols = document.getElementById('pwSymbols');
+    const genPwBtn = document.getElementById('genPwBtn');
+    const clearPwBtn = document.getElementById('clearPwBtn');
+    const pwOutput = document.getElementById('pwOutput');
+    const copyPwBtn = document.getElementById('copyPwBtn');
+
+    const urlPanel = document.querySelector('.urltools-panel');
+    const urlToolInput = document.getElementById('urlToolInput');
+    const encodeUrlBtn = document.getElementById('encodeUrlBtn');
+    const decodeUrlBtn = document.getElementById('decodeUrlBtn');
+    const urlToolResult = document.getElementById('urlToolResult');
+    const copyUrlToolBtn = document.getElementById('copyUrlToolBtn');
+
+    const colorsPanel = document.querySelector('.colors-panel');
+    const colorImageInput = document.getElementById('colorImageInput');
+    const extractColorsBtn = document.getElementById('extractColorsBtn');
+    const clearColorsBtn = document.getElementById('clearColorsBtn');
+    const colorPalette = document.getElementById('colorPalette');
+    const messengerPanel = document.querySelector('.messenger-panel');
+    const messengerUsernameInput = document.getElementById('messengerUsernameInput');
+    const messengerPasswordInput = document.getElementById('messengerPasswordInput');
+    const messengerLoginButton = document.getElementById('messengerLoginButton');
+    const messengerRegisterButton = document.getElementById('messengerRegisterButton');
+    const messengerLogoutButton = document.getElementById('messengerLogoutButton');
+    const messengerStatus = document.getElementById('messengerStatus');
+    const messengerInboxList = document.getElementById('messengerInboxList');
+    const messengerComposeTo = document.getElementById('messengerComposeTo');
+    const messengerComposeText = document.getElementById('messengerComposeText');
+    const messengerSendButton = document.getElementById('messengerSendButton');
+    const messengerCurrentUserLabel = document.getElementById('messengerCurrentUserLabel');
     const copyEncryptBtn = document.getElementById('copyEncrypt');
     const copyDecryptBtn = document.getElementById('copyDecrypt');
 
@@ -489,21 +667,28 @@
     }
 
     function showToolPanel(toolName) {
+      // hide all known panels
       cipherPanel.classList.add('hidden');
       qrPanel.classList.add('hidden');
       const htmlbuilderPanel = document.querySelector('.htmlbuilder-panel');
-      htmlbuilderPanel.classList.add('hidden');
-      if (tiktokPanel) tiktokPanel.classList.add('hidden');
-      
-      if (toolName === 'cipher') {
-        cipherPanel.classList.remove('hidden');
-      } else if (toolName === 'qr') {
-        qrPanel.classList.remove('hidden');
-      } else if (toolName === 'tiktok') {
-        if (tiktokPanel) tiktokPanel.classList.remove('hidden');
-      } else if (toolName === 'htmlbuilder') {
-        htmlbuilderPanel.classList.remove('hidden');
-      }
+      if (htmlbuilderPanel) htmlbuilderPanel.classList.add('hidden');
+      if (jsonPanel) jsonPanel.classList.add('hidden');
+      if (imagePanel) imagePanel.classList.add('hidden');
+      if (passwordPanel) passwordPanel.classList.add('hidden');
+      if (urlPanel) urlPanel.classList.add('hidden');
+      if (colorsPanel) colorsPanel.classList.add('hidden');
+      if (messengerPanel) messengerPanel.classList.add('hidden');
+
+      // show selected
+      if (toolName === 'cipher') cipherPanel.classList.remove('hidden');
+      else if (toolName === 'qr') qrPanel.classList.remove('hidden');
+      else if (toolName === 'htmlbuilder' && htmlbuilderPanel) htmlbuilderPanel.classList.remove('hidden');
+      else if (toolName === 'json' && jsonPanel) jsonPanel.classList.remove('hidden');
+      else if (toolName === 'image' && imagePanel) imagePanel.classList.remove('hidden');
+      else if (toolName === 'password' && passwordPanel) passwordPanel.classList.remove('hidden');
+      else if (toolName === 'urltools' && urlPanel) urlPanel.classList.remove('hidden');
+      else if (toolName === 'colors' && colorsPanel) colorsPanel.classList.remove('hidden');
+      else if (toolName === 'messenger' && messengerPanel) messengerPanel.classList.remove('hidden');
     }
 
     function selectTool(toolName) {
@@ -518,9 +703,24 @@
       } else if (toolName === 'htmlbuilder') {
         toolTitle.textContent = '📝 HTML File Builder';
         toolDesc.textContent = 'Create a downloadable HTML file from raw HTML source.';
-      } else if (toolName === 'tiktok') {
-        toolTitle.textContent = '📹 TikTok Link Resolver';
-        toolDesc.textContent = 'Resolve a TikTok page to the official video media URL (watermark preserved).';
+      } else if (toolName === 'json') {
+        toolTitle.textContent = '🗄️ JSON Formatter';
+        toolDesc.textContent = 'Validate, pretty-print, and minify JSON.';
+      } else if (toolName === 'image') {
+        toolTitle.textContent = '🖼️ Image Resizer';
+        toolDesc.textContent = 'Resize images client-side and download the result.';
+      } else if (toolName === 'password') {
+        toolTitle.textContent = '🔑 Password Generator';
+        toolDesc.textContent = 'Create strong, customizable passwords instantly.';
+      } else if (toolName === 'urltools') {
+        toolTitle.textContent = '🔗 URL Encoder / Decoder';
+        toolDesc.textContent = 'Encode or decode URL components safely.';
+      } else if (toolName === 'colors') {
+        toolTitle.textContent = '🎨 Color Extractor';
+        toolDesc.textContent = 'Extract dominant colors from an image and copy hex values.';
+      } else if (toolName === 'messenger') {
+        toolTitle.textContent = '💬 Messenger';
+        toolDesc.textContent = 'Login and access only your account messages.';
       }
       showToolPanel(toolName);
     }
@@ -528,6 +728,205 @@
     toolCards.forEach(card => {
       card.addEventListener('click', () => selectTool(card.dataset.tool));
     });
+
+    const MESSENGER_USERS_KEY = 'messengerUsers';
+    const MESSENGER_MESSAGES_KEY = 'messengerMessages';
+    let messengerCurrentUser = null;
+
+    function loadMessengerUsers() {
+      try {
+        return JSON.parse(localStorage.getItem(MESSENGER_USERS_KEY) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveMessengerUsers(users) {
+      localStorage.setItem(MESSENGER_USERS_KEY, JSON.stringify(users));
+    }
+
+    function loadMessengerMessages() {
+      try {
+        return JSON.parse(localStorage.getItem(MESSENGER_MESSAGES_KEY) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveMessengerMessages(messages) {
+      localStorage.setItem(MESSENGER_MESSAGES_KEY, JSON.stringify(messages));
+    }
+
+    function setMessengerStatus(message, isError = false) {
+      messengerStatus.textContent = message;
+      messengerStatus.style.color = isError ? '#ff7373' : '#b0d4ff';
+    }
+
+    function renderMessengerUsers() {
+      const users = loadMessengerUsers();
+      messengerComposeTo.innerHTML = '';
+      if (!messengerCurrentUser) {
+        const option = document.createElement('option');
+        option.textContent = 'Login to select recipient';
+        option.value = '';
+        messengerComposeTo.appendChild(option);
+        messengerComposeTo.disabled = true;
+        return;
+      }
+      const others = users.filter(u => u.username !== messengerCurrentUser);
+      if (!others.length) {
+        const option = document.createElement('option');
+        option.textContent = 'No other accounts available';
+        option.value = '';
+        messengerComposeTo.appendChild(option);
+        messengerComposeTo.disabled = true;
+        return;
+      }
+      messengerComposeTo.disabled = false;
+      const empty = document.createElement('option');
+      empty.textContent = 'Select recipient';
+      empty.value = '';
+      messengerComposeTo.appendChild(empty);
+      others.forEach(user => {
+        const option = document.createElement('option');
+        option.textContent = user.username;
+        option.value = user.username;
+        messengerComposeTo.appendChild(option);
+      });
+    }
+
+    function renderMessengerInbox() {
+      const messages = loadMessengerMessages();
+      messengerInboxList.innerHTML = '';
+      if (!messengerCurrentUser) {
+        messengerInboxList.textContent = 'Login to see your messages.';
+        return;
+      }
+      const userMessages = messages.filter(msg => msg.sender === messengerCurrentUser || msg.recipient === messengerCurrentUser);
+      if (!userMessages.length) {
+        messengerInboxList.textContent = 'No messages yet. Send or receive a message after login.';
+        return;
+      }
+      userMessages.sort((a, b) => a.timestamp - b.timestamp);
+      userMessages.forEach(msg => {
+        const item = document.createElement('div');
+        item.className = 'brute-item';
+        const direction = msg.sender === messengerCurrentUser ? 'Sent' : 'Received';
+        const peer = msg.sender === messengerCurrentUser ? msg.recipient : msg.sender;
+        const when = new Date(msg.timestamp).toLocaleString();
+        item.innerHTML = `<strong>${direction} ${direction === 'Sent' ? 'to' : 'from'} ${peer}</strong><br>${msg.text}<br><span class="note">${when}</span>`;
+        messengerInboxList.appendChild(item);
+      });
+    }
+
+    function updateMessengerAccountUI() {
+      if (!messengerCurrentUser) {
+        messengerCurrentUserLabel.textContent = 'Not logged in.';
+        messengerLogoutButton.disabled = true;
+        messengerSendButton.disabled = true;
+        messengerComposeText.disabled = true;
+        messengerComposeTo.disabled = true;
+      } else {
+        messengerCurrentUserLabel.textContent = `Logged in as ${messengerCurrentUser}`;
+        messengerLogoutButton.disabled = false;
+        messengerSendButton.disabled = false;
+        messengerComposeText.disabled = false;
+        messengerComposeTo.disabled = false;
+      }
+      renderMessengerUsers();
+      renderMessengerInbox();
+    }
+
+    function loginMessengerUser(username, password) {
+      const users = loadMessengerUsers();
+      const account = users.find(user => user.username === username);
+      if (!account) {
+        setMessengerStatus('Account not found. Please register.', true);
+        return false;
+      }
+      if (account.password !== password) {
+        setMessengerStatus('Incorrect password.', true);
+        return false;
+      }
+      messengerCurrentUser = username;
+      setMessengerStatus('Login successful. Your messages are now visible.');
+      updateMessengerAccountUI();
+      return true;
+    }
+
+    function registerMessengerUser(username, password) {
+      if (!username || !password) {
+        setMessengerStatus('Username and password are required.', true);
+        return false;
+      }
+      const normalized = username.trim().toLowerCase();
+      if (!normalized) {
+        setMessengerStatus('Choose a valid username.', true);
+        return false;
+      }
+      const users = loadMessengerUsers();
+      if (users.some(user => user.username.toLowerCase() === normalized)) {
+        setMessengerStatus('Username already exists.', true);
+        return false;
+      }
+      users.push({ username, password });
+      saveMessengerUsers(users);
+      messengerCurrentUser = username;
+      setMessengerStatus('Account created and logged in. You may now send messages.');
+      updateMessengerAccountUI();
+      return true;
+    }
+
+    function logoutMessengerUser() {
+      messengerCurrentUser = null;
+      messengerUsernameInput.value = '';
+      messengerPasswordInput.value = '';
+      setMessengerStatus('Logged out. Login to view your messages.');
+      updateMessengerAccountUI();
+    }
+
+    function sendMessengerMessage() {
+      if (!messengerCurrentUser) {
+        setMessengerStatus('Login first to send messages.', true);
+        return;
+      }
+      const recipient = messengerComposeTo.value;
+      const text = messengerComposeText.value.trim();
+      if (!recipient) {
+        setMessengerStatus('Choose a recipient before sending.', true);
+        return;
+      }
+      if (!text) {
+        setMessengerStatus('Enter a message to send.', true);
+        return;
+      }
+      if (recipient === messengerCurrentUser) {
+        setMessengerStatus('Cannot send a message to yourself.', true);
+        return;
+      }
+      const users = loadMessengerUsers();
+      if (!users.some(u => u.username === recipient)) {
+        setMessengerStatus('Recipient account not found.', true);
+        return;
+      }
+      const messages = loadMessengerMessages();
+      messages.push({ sender: messengerCurrentUser, recipient, text, timestamp: Date.now() });
+      saveMessengerMessages(messages);
+      messengerComposeText.value = '';
+      setMessengerStatus('Message sent successfully.');
+      renderMessengerInbox();
+    }
+
+    messengerLoginButton.addEventListener('click', () => {
+      loginMessengerUser(messengerUsernameInput.value.trim(), messengerPasswordInput.value);
+    });
+    messengerRegisterButton.addEventListener('click', () => {
+      registerMessengerUser(messengerUsernameInput.value.trim(), messengerPasswordInput.value);
+    });
+    messengerLogoutButton.addEventListener('click', logoutMessengerUser);
+    messengerSendButton.addEventListener('click', sendMessengerMessage);
+
+    updateMessengerAccountUI();
 
     let currentQrObjectUrl = null;
     let currentHtmlObjectUrl = null;
@@ -668,176 +1067,6 @@
         currentHtmlObjectUrl = null;
       }
     });
-
-    convertMp4Button.addEventListener('click', async () => {
-      const file = mp4Input.files[0];
-      if (!file) {
-        mp4Status.textContent = 'Select a local MP4 file first.';
-        mp4DownloadLink.style.display = 'none';
-        return;
-      }
-      const filenameValue = mp3FilenameInput.value.trim();
-      const outputName = filenameValue || file.name.replace(/\.[^/.]+$/, '.wav');
-      const mimeTypes = [
-        { mime: 'audio/mpeg', ext: '.mp3', label: 'MP3' },
-        { mime: 'audio/webm;codecs=opus', ext: '.webm', label: 'WebM' },
-        { mime: 'audio/ogg;codecs=opus', ext: '.ogg', label: 'OGG' },
-        { mime: 'audio/webm', ext: '.webm', label: 'WebM' },
-        { mime: 'audio/ogg', ext: '.ogg', label: 'OGG' }
-      ];
-      const supported = typeof MediaRecorder !== 'undefined'
-        ? mimeTypes.find(item => MediaRecorder.isTypeSupported(item.mime))
-        : null;
-      const canUseMediaRecorder = supported && typeof HTMLVideoElement.prototype.captureStream === 'function';
-      const wavFallback = !canUseMediaRecorder && (window.AudioContext || window.webkitAudioContext);
-
-      let mime = null;
-      let outputExtension = '.wav';
-      let outputFormatLabel = 'WAV';
-      if (canUseMediaRecorder) {
-        mime = supported.mime;
-        outputExtension = supported.ext;
-        outputFormatLabel = supported.label;
-      }
-
-      const outputFilename = outputName.toLowerCase().endsWith(outputExtension)
-        ? outputName
-        : `${outputName}${outputExtension}`;
-
-      mp4Status.textContent = 'Extracting audio...';
-      mp4DownloadLink.style.display = 'none';
-      if (currentMp4ObjectUrl) {
-        URL.revokeObjectURL(currentMp4ObjectUrl);
-        currentMp4ObjectUrl = null;
-      }
-
-      if (canUseMediaRecorder) {
-        const video = document.createElement('video');
-        video.muted = true;
-        video.preload = 'auto';
-        const videoObjectUrl = URL.createObjectURL(file);
-        video.src = videoObjectUrl;
-        video.style.display = 'none';
-        video.crossOrigin = 'anonymous';
-        document.body.appendChild(video);
-
-        try {
-          await new Promise((resolve, reject) => {
-            video.addEventListener('loadedmetadata', resolve, { once: true });
-            video.addEventListener('error', () => reject(new Error('Failed to load the video file')), { once: true });
-          });
-
-          const stream = video.captureStream();
-          const recorder = new MediaRecorder(stream, { mimeType: mime });
-          const chunks = [];
-          recorder.addEventListener('dataavailable', event => {
-            if (event.data && event.data.size) chunks.push(event.data);
-          });
-          const finished = new Promise(resolve => recorder.addEventListener('stop', resolve, { once: true }));
-          recorder.start();
-          await video.play().catch(() => {});
-          video.addEventListener('ended', () => recorder.stop(), { once: true });
-          await finished;
-
-          const blob = new Blob(chunks, { type: mime });
-          currentMp4ObjectUrl = URL.createObjectURL(blob);
-          mp4DownloadLink.href = currentMp4ObjectUrl;
-          mp4DownloadLink.download = outputFilename;
-          mp4DownloadLink.textContent = `Download ${outputFilename}`;
-          mp4DownloadLink.style.display = 'inline-block';
-          mp4Status.textContent = `Audio extraction complete (${outputFormatLabel}). Click the link to download.`;
-        } catch (error) {
-          mp4Status.textContent = 'Could not extract audio using MediaRecorder. Falling back to WAV extraction.';
-          console.error('MP4 conversion error:', error);
-        } finally {
-          if (video.parentElement) {
-            document.body.removeChild(video);
-          }
-          URL.revokeObjectURL(videoObjectUrl);
-        }
-      }
-
-      if (!canUseMediaRecorder) {
-        if (!wavFallback) {
-          mp4Status.textContent = 'Audio export is not supported by this browser. Try a different browser.';
-          return;
-        }
-        try {
-          mp4Status.textContent = 'Extracting audio as WAV...';
-          const wavBlob = await extractWavBlobFromFile(file);
-          currentMp4ObjectUrl = URL.createObjectURL(wavBlob);
-          mp4DownloadLink.href = currentMp4ObjectUrl;
-          mp4DownloadLink.download = outputFilename.toLowerCase().endsWith('.wav') ? outputFilename : `${outputName}.wav`;
-          mp4DownloadLink.textContent = `Download ${mp4DownloadLink.download}`;
-          mp4DownloadLink.style.display = 'inline-block';
-          mp4Status.textContent = 'Audio extraction complete (WAV). Click the link to download.';
-        } catch (error) {
-          mp4Status.textContent = 'Could not extract audio from the selected file. Try a different MP4 or browser.';
-          console.error('WAV extraction error:', error);
-        }
-      }
-    });
-
-    // Client-side FFmpeg (ffmpeg.wasm) conversion
-    let ffmpegLoaded = false;
-    let ffmpeg = null;
-    convertWasmButton.addEventListener('click', async () => {
-      const file = mp4Input.files[0];
-      if (!file) {
-        mp4Status.textContent = 'Select a local MP4 file first.';
-        mp4DownloadLink.style.display = 'none';
-        return;
-      }
-      mp4Status.textContent = 'Loading ffmpeg.wasm (this may take a while)...';
-      try {
-        const { createFFmpeg, fetchFile } = FFmpeg;
-        if (!ffmpeg) ffmpeg = createFFmpeg({ log: true });
-        if (!ffmpeg.isLoaded()) await ffmpeg.load();
-        mp4Status.textContent = 'Converting in browser (this may take a minute)...';
-        if (currentMp4ObjectUrl) { URL.revokeObjectURL(currentMp4ObjectUrl); currentMp4ObjectUrl = null; }
-        ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
-        await ffmpeg.run('-i', 'input.mp4', '-vn', '-acodec', 'libmp3lame', '-b:a', '192k', 'output.mp3');
-        const data = ffmpeg.FS('readFile', 'output.mp3');
-        const blob = new Blob([data.buffer], { type: 'audio/mpeg' });
-        currentMp4ObjectUrl = URL.createObjectURL(blob);
-        const outputFilename = (mp3FilenameInput.value.trim() || file.name.replace(/\.[^/.]+$/, '.mp3'));
-        mp4DownloadLink.href = currentMp4ObjectUrl;
-        mp4DownloadLink.download = outputFilename;
-        mp4DownloadLink.textContent = `Download ${outputFilename}`;
-        mp4DownloadLink.style.display = 'inline-block';
-        mp4Status.textContent = 'In-browser conversion complete. Click the link to download.';
-      } catch (err) {
-        console.error('ffmpeg.wasm error:', err);
-        mp4Status.textContent = 'In-browser conversion failed. See console for details.';
-      }
-    });
-
-    // Mini AI: simple rule-based assistant
-    const aiHistory = [];
-    let lastKnowledgeKey = null;
-    function addAiMessage(role, text) {
-      aiHistory.push({ role, text });
-      if (aiHistory.length > 40) aiHistory.shift();
-      renderAi();
-    }
-    function renderAi() {
-      aiOutput.innerHTML = '';
-      aiHistory.forEach(msg => {
-        const d = document.createElement('div');
-        d.style.margin = '8px 0';
-        d.style.whiteSpace = 'pre-wrap';
-        if (msg.role === 'user') {
-          d.style.color = '#b0e0ff';
-          d.textContent = 'You: ' + msg.text;
-        } else {
-          d.style.color = '#a8f0a8';
-          d.textContent = 'AI: ' + msg.text;
-        }
-        aiOutput.appendChild(d);
-      });
-      aiOutput.scrollTop = aiOutput.scrollHeight;
-    }
-
     // Lightweight on-device knowledge base for richer answers
     const knowledgeBase = [
       {
@@ -1047,136 +1276,6 @@
       }, 300 + Math.random() * 600);
     }
 
-    aiSendButton.addEventListener('click', sendAi);
-    aiInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendAi(); });
-    aiClearButton.addEventListener('click', () => { aiHistory.length = 0; renderAi(); aiStatus.textContent = 'Cleared.'; });
-
-    openBrowserButton.addEventListener('click', () => {
-      let url = browserUrlInput.value.trim();
-      if (!url) {
-        browserStatus.textContent = 'Enter a URL first.';
-        return;
-      }
-      if (!/^https?:\/\//i.test(url)) {
-        url = 'https://' + url;
-      }
-      browserStatus.textContent = 'Loading...';
-      browserFrame.src = url;
-      browserFrame.onload = () => {
-        browserStatus.textContent = `Loaded ${url}`;
-      };
-      browserFrame.onerror = () => {
-        browserStatus.textContent = 'Unable to load the URL. The site may block embedding.';
-      };
-    });
-
-    clearBrowserButton.addEventListener('click', () => {
-      browserUrlInput.value = '';
-      browserStatus.textContent = 'Enter a URL to open it safely inside the embedded browser frame.';
-      browserFrame.src = 'about:blank';
-    });
-
-    convertServerButton.addEventListener('click', async () => {
-      const file = mp4Input.files[0];
-      if (!file) {
-        mp4Status.textContent = 'Select a local MP4 file first.';
-        mp4DownloadLink.style.display = 'none';
-        return;
-      }
-      mp4Status.textContent = 'Uploading to local server...';
-      mp4DownloadLink.style.display = 'none';
-      try {
-        const form = new FormData();
-        form.append('file', file, file.name);
-        const resp = await fetch('http://127.0.0.1:5000/convert', { method: 'POST', body: form });
-        if (!resp.ok) {
-          const err = await resp.json().catch(() => ({}));
-          mp4Status.textContent = err.error || `Server returned ${resp.status}`;
-          return;
-        }
-        const blob = await resp.blob();
-        if (currentMp4ObjectUrl) { URL.revokeObjectURL(currentMp4ObjectUrl); currentMp4ObjectUrl = null; }
-        currentMp4ObjectUrl = URL.createObjectURL(blob);
-        const contentDisposition = resp.headers.get('content-disposition') || '';
-        let filename = mp3FilenameInput.value.trim() || 'audio.mp3';
-        const m = /filename\*=UTF-8''(.+)$/.exec(contentDisposition) || /filename="?([^";]+)"?/.exec(contentDisposition);
-        if (m) filename = decodeURIComponent(m[1]);
-        mp4DownloadLink.href = currentMp4ObjectUrl;
-        mp4DownloadLink.download = filename;
-        mp4DownloadLink.textContent = `Download ${filename}`;
-        mp4DownloadLink.style.display = 'inline-block';
-        mp4Status.textContent = 'Server conversion complete. Click link to download.';
-      } catch (error) {
-        mp4Status.textContent = 'Could not reach local server at http://127.0.0.1:5000. Start `server.py` first.';
-        console.error('Server conversion error:', error);
-      }
-    });
-
-    function updateDesignerPreview() {
-      const html = designerSourceInput.value;
-      if (!html.trim()) {
-        designerPreviewFrame.srcdoc = '<!DOCTYPE html><html><body style="color:#777;font-family:sans-serif;padding:20px;"><p>Paste HTML to preview it here.</p></body></html>';
-        designerStatus.textContent = 'Paste HTML above to preview it live.';
-        return;
-      }
-      designerPreviewFrame.srcdoc = html;
-      designerStatus.textContent = 'Live preview updated.';
-    }
-
-    function insertDesignerSnippet(snippet) {
-      const textarea = designerSourceInput;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const before = textarea.value.slice(0, start);
-      const after = textarea.value.slice(end);
-      textarea.value = before + snippet + after;
-      textarea.focus();
-      textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
-      updateDesignerPreview();
-    }
-
-    designerPreviewButton.addEventListener('click', updateDesignerPreview);
-    designerDownloadButton.addEventListener('click', () => {
-      const html = designerSourceInput.value;
-      if (!html.trim()) {
-        designerStatus.textContent = 'Write HTML before downloading.';
-        return;
-      }
-      const blob = new Blob([html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = 'designer.html';
-      document.body.appendChild(anchor);
-      anchor.click();
-      document.body.removeChild(anchor);
-      setTimeout(() => { URL.revokeObjectURL(url); }, 1000);
-      designerStatus.textContent = 'Downloaded HTML file.';
-    });
-
-    designerClearButton.addEventListener('click', () => {
-      designerSourceInput.value = '';
-      updateDesignerPreview();
-      designerStatus.textContent = 'Cleared design canvas.';
-    });
-
-    document.querySelectorAll('.snippet-btn').forEach(button => {
-      button.addEventListener('click', () => insertDesignerSnippet(button.dataset.snippet));
-    });
-
-    clearMp4Button.addEventListener('click', () => {
-      mp4Input.value = '';
-      mp3FilenameInput.value = '';
-      mp4Status.textContent = 'This tool extracts audio from a local MP4 file. Browser MP3 export support may vary.';
-      mp4DownloadLink.href = '#';
-      mp4DownloadLink.textContent = 'Download MP3';
-      mp4DownloadLink.style.display = 'none';
-      if (currentMp4ObjectUrl) {
-        URL.revokeObjectURL(currentMp4ObjectUrl);
-        currentMp4ObjectUrl = null;
-      }
-    });
-
     document.addEventListener('keydown', event => {
       if ((event.key === 'ArrowLeft' || event.key === 'Escape') && !toolScreen.classList.contains('hidden')) {
         showHub();
@@ -1383,56 +1482,82 @@
 
     updateKeyVisibility();
 
-    // TikTok resolver
-    if (resolveTiktokBtn) {
-      resolveTiktokBtn.addEventListener('click', async () => {
-        const url = (tiktokUrlInput && tiktokUrlInput.value || '').trim();
-        if (!url) {
-          tiktokResult.textContent = 'Enter a TikTok page URL first.';
-          return;
-        }
-        tiktokResult.textContent = 'Resolving...';
-        try {
-          const resp = await fetch(`${API_BASE}/api/get-video`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url })
-          });
-          if (!resp.ok) {
-            const err = await resp.json().catch(() => ({}));
-            tiktokResult.textContent = err.error || `Server returned ${resp.status}`;
-            return;
-          }
-          const data = await resp.json();
-          if (data.video) {
-            tiktokResult.textContent = data.video;
-          } else {
-            tiktokResult.textContent = 'Video link not found.';
-          }
-        } catch (e) {
-          tiktokResult.textContent = 'Could not reach resolver server.';
-          console.error(e);
-        }
-      });
-    }
+    // JSON formatter
+    if (formatJsonBtn) formatJsonBtn.addEventListener('click', () => {
+      const s = (jsonInput.value || '').trim();
+      if (!s) { jsonOutput.textContent = 'Paste JSON first.'; return; }
+      try { jsonOutput.textContent = JSON.stringify(JSON.parse(s), null, 2); } catch (e) { jsonOutput.textContent = 'Invalid JSON: ' + e.message; }
+    });
+    if (minifyJsonBtn) minifyJsonBtn.addEventListener('click', () => {
+      const s = (jsonInput.value || '').trim();
+      if (!s) { jsonOutput.textContent = 'Paste JSON first.'; return; }
+      try { jsonOutput.textContent = JSON.stringify(JSON.parse(s)); } catch (e) { jsonOutput.textContent = 'Invalid JSON: ' + e.message; }
+    });
+    if (copyJsonBtn) copyJsonBtn.addEventListener('click', () => { navigator.clipboard.writeText(jsonOutput.textContent || ''); });
 
-    if (clearTiktokBtn) {
-      clearTiktokBtn.addEventListener('click', () => {
-        if (tiktokUrlInput) tiktokUrlInput.value = '';
-        if (tiktokResult) tiktokResult.textContent = 'No result yet.';
-      });
-    }
+    // Image resizer (client-side)
+    if (resizeImageBtn) resizeImageBtn.addEventListener('click', async () => {
+      const file = imageInput.files && imageInput.files[0];
+      if (!file) return alert('Choose an image first');
+      const w = parseInt(imageWidth.value, 10) || null;
+      const h = parseInt(imageHeight.value, 10) || null;
+      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file); });
+      const canvas = document.createElement('canvas');
+      if (!w && !h) { alert('Specify at least a width or height'); return; }
+      if (!w) canvas.width = Math.round(img.width * (h / img.height)); else canvas.width = w;
+      if (!h) canvas.height = Math.round(img.height * (canvas.width / img.width)); else canvas.height = h;
+      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = file.name.replace(/(\.[^.]+)$/, '') + `-${canvas.width}x${canvas.height}.png`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      }, 'image/png');
+    });
+    if (clearImageBtn) clearImageBtn.addEventListener('click', () => { imageInput.value = ''; imagePreview.src = ''; imagePreview.style.display = 'none'; imageWidth.value = ''; imageHeight.value = ''; });
+    if (imageInput) imageInput.addEventListener('change', () => {
+      const f = imageInput.files && imageInput.files[0]; if (!f) return; const url = URL.createObjectURL(f); imagePreview.src = url; imagePreview.style.display = 'block';
+    });
 
-    if (copyTiktokLink) {
-      copyTiktokLink.addEventListener('click', () => {
-        const text = tiktokResult.textContent || '';
-        if (!text || text === 'No result yet.' || text.startsWith('Enter')) return;
-        navigator.clipboard.writeText(text).then(() => {
-          copyTiktokLink.textContent = 'Copied!';
-          setTimeout(() => { copyTiktokLink.textContent = 'Copy'; }, 2000);
-        });
-      });
+    // Password generator
+    function generatePassword() {
+      const length = Math.max(4, Math.min(128, parseInt(pwLength.value, 10) || 16));
+      let chars = '';
+      if (pwLower.checked) chars += 'abcdefghijklmnopqrstuvwxyz';
+      if (pwUpper.checked) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      if (pwNumbers.checked) chars += '0123456789';
+      if (pwSymbols.checked) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+      if (!chars) return '';
+      let out = '';
+      const rnd = crypto.getRandomValues(new Uint32Array(length));
+      for (let i = 0; i < length; i++) out += chars[rnd[i] % chars.length];
+      return out;
     }
+    if (genPwBtn) genPwBtn.addEventListener('click', () => { const p = generatePassword(); pwOutput.textContent = p || 'Enable at least one character set'; });
+    if (clearPwBtn) clearPwBtn.addEventListener('click', () => { pwOutput.textContent = 'No password yet.'; pwLength.value = '16'; pwLower.checked = true; pwUpper.checked = true; pwNumbers.checked = true; pwSymbols.checked = false; });
+    if (copyPwBtn) copyPwBtn.addEventListener('click', () => { navigator.clipboard.writeText(pwOutput.textContent || ''); });
+
+    // URL encode/decode
+    if (encodeUrlBtn) encodeUrlBtn.addEventListener('click', () => { try { urlToolResult.textContent = encodeURIComponent(urlToolInput.value || ''); } catch (e) { urlToolResult.textContent = 'Error'; } });
+    if (decodeUrlBtn) decodeUrlBtn.addEventListener('click', () => { try { urlToolResult.textContent = decodeURIComponent(urlToolInput.value || ''); } catch (e) { urlToolResult.textContent = 'Invalid encoding'; } });
+    if (copyUrlToolBtn) copyUrlToolBtn.addEventListener('click', () => { navigator.clipboard.writeText(urlToolResult.textContent || ''); });
+
+    // Color extractor (simple: sample a few pixels)
+    if (extractColorsBtn) extractColorsBtn.addEventListener('click', async () => {
+      const f = colorImageInput.files && colorImageInput.files[0]; if (!f) return alert('Choose an image');
+      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(f); });
+      const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height; const ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0);
+      const stepX = Math.max(1, Math.floor(img.width / 6)); const stepY = Math.max(1, Math.floor(img.height / 4));
+      const cols = new Set();
+      for (let x = 0; x < img.width; x += stepX) for (let y = 0; y < img.height; y += stepY) {
+        const p = ctx.getImageData(x,y,1,1).data; cols.add('#' + [p[0],p[1],p[2]].map(v => v.toString(16).padStart(2,'0')).join(''));
+        if (cols.size >= 8) break;
+      }
+      colorPalette.innerHTML = '';
+      if (!cols.size) colorPalette.textContent = 'No colors found';
+      cols.forEach(hex => {
+        const d = document.createElement('div'); d.style.width = '40px'; d.style.height = '40px'; d.style.borderRadius = '6px'; d.style.background = hex; d.title = hex; d.style.cursor = 'pointer'; d.addEventListener('click', () => { navigator.clipboard.writeText(hex); d.textContent = '✓'; setTimeout(() => { d.textContent = ''; }, 800); }); colorPalette.appendChild(d);
+      });
+    });
+    if (clearColorsBtn) clearColorsBtn.addEventListener('click', () => { colorImageInput.value = ''; colorPalette.innerHTML = 'No colors yet.'; });
   </script>
 </body>
 </html>
