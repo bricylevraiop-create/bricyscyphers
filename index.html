@@ -287,9 +287,9 @@
           <h2>Color Extractor</h2>
           <p>Extract dominant colors from an image and copy hex values.</p>
         </button>
-        <button class="tool-card" data-tool="messenger">
-          <h2>Messenger</h2>
-          <p>Login and view only your account messages.</p>
+        <button class="tool-card" data-tool="youtube">
+          <h2>YouTube → MP3</h2>
+          <p>Convert YouTube videos to MP3 audio directly from the site.</p>
         </button>
       </div>
     </div>
@@ -493,6 +493,28 @@
           <div class="output-card">
             <div class="output-label">Palette</div>
             <div class="output-text" id="colorPalette" style="display:flex;gap:8px;flex-wrap:wrap;min-height:120px;align-items:center;">No colors yet.</div>
+            <div id="selectedColorHex" class="note" style="margin-top:12px;">Click a swatch to copy the exact hex code.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="youtube-panel hidden">
+      <div class="main">
+        <div class="left-panel">
+          <div class="section-title">YouTube to MP3</div>
+          <div class="field">
+            <input id="youtubeUrlInput" type="url" placeholder="Paste YouTube video URL" />
+          </div>
+          <div class="action-buttons">
+            <button class="primary" id="youtubeConvertBtn">Convert to MP3</button>
+            <button class="secondary" id="youtubeClearBtn">Clear</button>
+          </div>
+          <div id="youtubeStatus" class="note">Paste a YouTube link and convert it to MP3.</div>
+        </div>
+        <div class="right-panel">
+          <div class="output-card">
+            <div class="output-label">Download</div>
+            <div class="output-text" id="youtubeOutput">Waiting for a YouTube URL.</div>
           </div>
         </div>
       </div>
@@ -525,53 +547,6 @@
       </div>
     </div>
 
-    <div class="messenger-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">Messenger Login</div>
-          <div class="field">
-            <label for="messengerUsernameInput">Username</label>
-            <input id="messengerUsernameInput" type="text" placeholder="Enter your username" />
-          </div>
-          <div class="field">
-            <label for="messengerPasswordInput">Password</label>
-            <input id="messengerPasswordInput" type="password" placeholder="Enter your password" />
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="messengerLoginButton">Login</button>
-            <button class="primary" id="messengerRegisterButton">Register</button>
-          </div>
-          <div class="action-buttons">
-            <button class="secondary" id="messengerLogoutButton">Logout</button>
-          </div>
-          <div id="messengerStatus" class="note">Login is required to view and send messages.</div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Your Account</div>
-            <div class="output-text" id="messengerCurrentUserLabel">Not logged in.</div>
-          </div>
-          <div class="output-card">
-            <div class="output-label">Compose Message</div>
-            <div class="field">
-              <label for="messengerComposeTo">Send to</label>
-              <select id="messengerComposeTo"></select>
-            </div>
-            <div class="field">
-              <label for="messengerComposeText">Message</label>
-              <textarea id="messengerComposeText" placeholder="Type your message here..."></textarea>
-            </div>
-            <div class="action-buttons">
-              <button class="primary" id="messengerSendButton">Send</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="output-card" style="margin-top:16px;">
-        <div class="output-label">Inbox</div>
-        <div class="brute-list" id="messengerInboxList">Your messages will appear here after login.</div>
-      </div>
-    </div>
   </div>
 
   <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
@@ -646,18 +621,15 @@
     const extractColorsBtn = document.getElementById('extractColorsBtn');
     const clearColorsBtn = document.getElementById('clearColorsBtn');
     const colorPalette = document.getElementById('colorPalette');
-    const messengerPanel = document.querySelector('.messenger-panel');
-    const messengerUsernameInput = document.getElementById('messengerUsernameInput');
-    const messengerPasswordInput = document.getElementById('messengerPasswordInput');
-    const messengerLoginButton = document.getElementById('messengerLoginButton');
-    const messengerRegisterButton = document.getElementById('messengerRegisterButton');
-    const messengerLogoutButton = document.getElementById('messengerLogoutButton');
-    const messengerStatus = document.getElementById('messengerStatus');
-    const messengerInboxList = document.getElementById('messengerInboxList');
-    const messengerComposeTo = document.getElementById('messengerComposeTo');
-    const messengerComposeText = document.getElementById('messengerComposeText');
-    const messengerSendButton = document.getElementById('messengerSendButton');
-    const messengerCurrentUserLabel = document.getElementById('messengerCurrentUserLabel');
+    const selectedColorHex = document.getElementById('selectedColorHex');
+
+    const youtubePanel = document.querySelector('.youtube-panel');
+    const youtubeUrlInput = document.getElementById('youtubeUrlInput');
+    const youtubeConvertBtn = document.getElementById('youtubeConvertBtn');
+    const youtubeClearBtn = document.getElementById('youtubeClearBtn');
+    const youtubeStatus = document.getElementById('youtubeStatus');
+    const youtubeOutput = document.getElementById('youtubeOutput');
+
     const copyEncryptBtn = document.getElementById('copyEncrypt');
     const copyDecryptBtn = document.getElementById('copyDecrypt');
 
@@ -677,7 +649,7 @@
       if (passwordPanel) passwordPanel.classList.add('hidden');
       if (urlPanel) urlPanel.classList.add('hidden');
       if (colorsPanel) colorsPanel.classList.add('hidden');
-      if (messengerPanel) messengerPanel.classList.add('hidden');
+      if (youtubePanel) youtubePanel.classList.add('hidden');
 
       // show selected
       if (toolName === 'cipher') cipherPanel.classList.remove('hidden');
@@ -688,7 +660,7 @@
       else if (toolName === 'password' && passwordPanel) passwordPanel.classList.remove('hidden');
       else if (toolName === 'urltools' && urlPanel) urlPanel.classList.remove('hidden');
       else if (toolName === 'colors' && colorsPanel) colorsPanel.classList.remove('hidden');
-      else if (toolName === 'messenger' && messengerPanel) messengerPanel.classList.remove('hidden');
+      else if (toolName === 'youtube' && youtubePanel) youtubePanel.classList.remove('hidden');
     }
 
     function selectTool(toolName) {
@@ -718,9 +690,9 @@
       } else if (toolName === 'colors') {
         toolTitle.textContent = '🎨 Color Extractor';
         toolDesc.textContent = 'Extract dominant colors from an image and copy hex values.';
-      } else if (toolName === 'messenger') {
-        toolTitle.textContent = '💬 Messenger';
-        toolDesc.textContent = 'Login and access only your account messages.';
+      } else if (toolName === 'youtube') {
+        toolTitle.textContent = '🎵 YouTube → MP3';
+        toolDesc.textContent = 'Convert YouTube videos to MP3 audio directly from the site.';
       }
       showToolPanel(toolName);
     }
@@ -729,204 +701,51 @@
       card.addEventListener('click', () => selectTool(card.dataset.tool));
     });
 
-    const MESSENGER_USERS_KEY = 'messengerUsers';
-    const MESSENGER_MESSAGES_KEY = 'messengerMessages';
-    let messengerCurrentUser = null;
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
 
-    function loadMessengerUsers() {
+    async function convertYouTubeToMp3() {
+      const url = (youtubeUrlInput.value || '').trim();
+      if (!url) {
+        youtubeStatus.textContent = 'Enter a YouTube video URL first.';
+        return;
+      }
+      youtubeStatus.textContent = 'Converting... please wait.';
+      youtubeOutput.textContent = 'Processing your download.';
       try {
-        return JSON.parse(localStorage.getItem(MESSENGER_USERS_KEY) || '[]');
-      } catch (e) {
-        return [];
+        const response = await fetch(`http://localhost:3000/api/ytmp3?url=${encodeURIComponent(url)}`);
+        if (!response.ok) {
+          const data = await response.json().catch(() => null);
+          youtubeStatus.textContent = data && data.error ? data.error : 'Conversion failed.';
+          youtubeOutput.textContent = 'Unable to download audio.';
+          return;
+        }
+        const blob = await response.blob();
+        const filename = 'youtube-audio.mp3';
+        downloadBlob(blob, filename);
+        youtubeStatus.textContent = 'Conversion complete! The download should start automatically.';
+        youtubeOutput.textContent = `Downloaded ${filename}`;
+      } catch (error) {
+        youtubeStatus.textContent = 'Conversion failed. Make sure the local server is running.';
+        youtubeOutput.textContent = error.message || 'Unexpected error.';
+        console.error('YouTube conversion error:', error);
       }
     }
 
-    function saveMessengerUsers(users) {
-      localStorage.setItem(MESSENGER_USERS_KEY, JSON.stringify(users));
-    }
-
-    function loadMessengerMessages() {
-      try {
-        return JSON.parse(localStorage.getItem(MESSENGER_MESSAGES_KEY) || '[]');
-      } catch (e) {
-        return [];
-      }
-    }
-
-    function saveMessengerMessages(messages) {
-      localStorage.setItem(MESSENGER_MESSAGES_KEY, JSON.stringify(messages));
-    }
-
-    function setMessengerStatus(message, isError = false) {
-      messengerStatus.textContent = message;
-      messengerStatus.style.color = isError ? '#ff7373' : '#b0d4ff';
-    }
-
-    function renderMessengerUsers() {
-      const users = loadMessengerUsers();
-      messengerComposeTo.innerHTML = '';
-      if (!messengerCurrentUser) {
-        const option = document.createElement('option');
-        option.textContent = 'Login to select recipient';
-        option.value = '';
-        messengerComposeTo.appendChild(option);
-        messengerComposeTo.disabled = true;
-        return;
-      }
-      const others = users.filter(u => u.username !== messengerCurrentUser);
-      if (!others.length) {
-        const option = document.createElement('option');
-        option.textContent = 'No other accounts available';
-        option.value = '';
-        messengerComposeTo.appendChild(option);
-        messengerComposeTo.disabled = true;
-        return;
-      }
-      messengerComposeTo.disabled = false;
-      const empty = document.createElement('option');
-      empty.textContent = 'Select recipient';
-      empty.value = '';
-      messengerComposeTo.appendChild(empty);
-      others.forEach(user => {
-        const option = document.createElement('option');
-        option.textContent = user.username;
-        option.value = user.username;
-        messengerComposeTo.appendChild(option);
-      });
-    }
-
-    function renderMessengerInbox() {
-      const messages = loadMessengerMessages();
-      messengerInboxList.innerHTML = '';
-      if (!messengerCurrentUser) {
-        messengerInboxList.textContent = 'Login to see your messages.';
-        return;
-      }
-      const userMessages = messages.filter(msg => msg.sender === messengerCurrentUser || msg.recipient === messengerCurrentUser);
-      if (!userMessages.length) {
-        messengerInboxList.textContent = 'No messages yet. Send or receive a message after login.';
-        return;
-      }
-      userMessages.sort((a, b) => a.timestamp - b.timestamp);
-      userMessages.forEach(msg => {
-        const item = document.createElement('div');
-        item.className = 'brute-item';
-        const direction = msg.sender === messengerCurrentUser ? 'Sent' : 'Received';
-        const peer = msg.sender === messengerCurrentUser ? msg.recipient : msg.sender;
-        const when = new Date(msg.timestamp).toLocaleString();
-        item.innerHTML = `<strong>${direction} ${direction === 'Sent' ? 'to' : 'from'} ${peer}</strong><br>${msg.text}<br><span class="note">${when}</span>`;
-        messengerInboxList.appendChild(item);
-      });
-    }
-
-    function updateMessengerAccountUI() {
-      if (!messengerCurrentUser) {
-        messengerCurrentUserLabel.textContent = 'Not logged in.';
-        messengerLogoutButton.disabled = true;
-        messengerSendButton.disabled = true;
-        messengerComposeText.disabled = true;
-        messengerComposeTo.disabled = true;
-      } else {
-        messengerCurrentUserLabel.textContent = `Logged in as ${messengerCurrentUser}`;
-        messengerLogoutButton.disabled = false;
-        messengerSendButton.disabled = false;
-        messengerComposeText.disabled = false;
-        messengerComposeTo.disabled = false;
-      }
-      renderMessengerUsers();
-      renderMessengerInbox();
-    }
-
-    function loginMessengerUser(username, password) {
-      const users = loadMessengerUsers();
-      const account = users.find(user => user.username === username);
-      if (!account) {
-        setMessengerStatus('Account not found. Please register.', true);
-        return false;
-      }
-      if (account.password !== password) {
-        setMessengerStatus('Incorrect password.', true);
-        return false;
-      }
-      messengerCurrentUser = username;
-      setMessengerStatus('Login successful. Your messages are now visible.');
-      updateMessengerAccountUI();
-      return true;
-    }
-
-    function registerMessengerUser(username, password) {
-      if (!username || !password) {
-        setMessengerStatus('Username and password are required.', true);
-        return false;
-      }
-      const normalized = username.trim().toLowerCase();
-      if (!normalized) {
-        setMessengerStatus('Choose a valid username.', true);
-        return false;
-      }
-      const users = loadMessengerUsers();
-      if (users.some(user => user.username.toLowerCase() === normalized)) {
-        setMessengerStatus('Username already exists.', true);
-        return false;
-      }
-      users.push({ username, password });
-      saveMessengerUsers(users);
-      messengerCurrentUser = username;
-      setMessengerStatus('Account created and logged in. You may now send messages.');
-      updateMessengerAccountUI();
-      return true;
-    }
-
-    function logoutMessengerUser() {
-      messengerCurrentUser = null;
-      messengerUsernameInput.value = '';
-      messengerPasswordInput.value = '';
-      setMessengerStatus('Logged out. Login to view your messages.');
-      updateMessengerAccountUI();
-    }
-
-    function sendMessengerMessage() {
-      if (!messengerCurrentUser) {
-        setMessengerStatus('Login first to send messages.', true);
-        return;
-      }
-      const recipient = messengerComposeTo.value;
-      const text = messengerComposeText.value.trim();
-      if (!recipient) {
-        setMessengerStatus('Choose a recipient before sending.', true);
-        return;
-      }
-      if (!text) {
-        setMessengerStatus('Enter a message to send.', true);
-        return;
-      }
-      if (recipient === messengerCurrentUser) {
-        setMessengerStatus('Cannot send a message to yourself.', true);
-        return;
-      }
-      const users = loadMessengerUsers();
-      if (!users.some(u => u.username === recipient)) {
-        setMessengerStatus('Recipient account not found.', true);
-        return;
-      }
-      const messages = loadMessengerMessages();
-      messages.push({ sender: messengerCurrentUser, recipient, text, timestamp: Date.now() });
-      saveMessengerMessages(messages);
-      messengerComposeText.value = '';
-      setMessengerStatus('Message sent successfully.');
-      renderMessengerInbox();
-    }
-
-    messengerLoginButton.addEventListener('click', () => {
-      loginMessengerUser(messengerUsernameInput.value.trim(), messengerPasswordInput.value);
+    if (youtubeConvertBtn) youtubeConvertBtn.addEventListener('click', convertYouTubeToMp3);
+    if (youtubeClearBtn) youtubeClearBtn.addEventListener('click', () => {
+      youtubeUrlInput.value = '';
+      youtubeStatus.textContent = 'Paste a YouTube link and convert it to MP3.';
+      youtubeOutput.textContent = 'Waiting for a YouTube URL.';
     });
-    messengerRegisterButton.addEventListener('click', () => {
-      registerMessengerUser(messengerUsernameInput.value.trim(), messengerPasswordInput.value);
-    });
-    messengerLogoutButton.addEventListener('click', logoutMessengerUser);
-    messengerSendButton.addEventListener('click', sendMessengerMessage);
-
-    updateMessengerAccountUI();
 
     let currentQrObjectUrl = null;
     let currentHtmlObjectUrl = null;
@@ -1554,10 +1373,23 @@
       colorPalette.innerHTML = '';
       if (!cols.size) colorPalette.textContent = 'No colors found';
       cols.forEach(hex => {
-        const d = document.createElement('div'); d.style.width = '40px'; d.style.height = '40px'; d.style.borderRadius = '6px'; d.style.background = hex; d.title = hex; d.style.cursor = 'pointer'; d.addEventListener('click', () => { navigator.clipboard.writeText(hex); d.textContent = '✓'; setTimeout(() => { d.textContent = ''; }, 800); }); colorPalette.appendChild(d);
+        const d = document.createElement('div');
+        d.style.width = '40px';
+        d.style.height = '40px';
+        d.style.borderRadius = '6px';
+        d.style.background = hex;
+        d.title = hex;
+        d.style.cursor = 'pointer';
+        d.addEventListener('click', () => {
+          navigator.clipboard.writeText(hex);
+          selectedColorHex.textContent = `HEX: ${hex}`;
+          d.textContent = '✓';
+          setTimeout(() => { d.textContent = ''; }, 800);
+        });
+        colorPalette.appendChild(d);
       });
     });
-    if (clearColorsBtn) clearColorsBtn.addEventListener('click', () => { colorImageInput.value = ''; colorPalette.innerHTML = 'No colors yet.'; });
+    if (clearColorsBtn) clearColorsBtn.addEventListener('click', () => { colorImageInput.value = ''; colorPalette.innerHTML = 'No colors yet.'; selectedColorHex.textContent = 'Click a swatch to copy the exact hex code.'; });
   </script>
 </body>
 </html>
