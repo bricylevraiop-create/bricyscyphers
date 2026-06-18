@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bricy's Hub</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="audio-data.js"></script>
   <style>
     :root {
       color-scheme: dark;
@@ -418,7 +420,7 @@
 </head>
 <body>
   <canvas id="particleCanvas"></canvas>
-  <audio id="bgAudio" src="playthatsound.mp3" loop preload="auto"></audio>
+  <audio id="bgAudio" loop preload="auto"></audio>
   <div id="audioUnlockOverlay" aria-hidden="true">
     <div class="panel" role="dialog" aria-label="Enable audio dialog">
       <h3>Enable Ambient Audio</h3>
@@ -997,6 +999,9 @@
     const musicVolume = document.getElementById('musicVolume');
     const musicStatus = document.getElementById('musicStatus');
     const bgAudio = document.getElementById('bgAudio');
+    if (bgAudio && typeof embeddedAudioData !== 'undefined') {
+      bgAudio.src = embeddedAudioData;
+    }
     const audioUnlockOverlay = document.getElementById('audioUnlockOverlay');
     const enableAudioBtn = document.getElementById('enableAudioBtn');
     const activeToolCount = document.getElementById('activeToolCount');
