@@ -1049,6 +1049,29 @@
       bgAudio.loop = true;
     }
 
+    // Attempt to unlock audio on the first user gesture (fixes hosted-site autoplay blocks)
+    function unlockAudio() {
+      try {
+        if (bgAudio && bgAudio.paused) {
+          bgAudio.play().then(() => {
+            setMusicStatus('Ambient sound unlocked and playing.');
+            logDashboardAction('Audio unlocked via user gesture.');
+          }).catch(() => {
+            // ignore
+          });
+        }
+        if (window.AudioContext || window.webkitAudioContext) {
+          // create+resume a short AudioContext to satisfy some autoplay policies
+          const C = window.AudioContext || window.webkitAudioContext;
+          const ac = new C();
+          if (ac.state === 'suspended' && typeof ac.resume === 'function') ac.resume().catch(() => {});
+        }
+      } catch (e) {
+        // ignore
+      }
+      try { document.removeEventListener('click', unlockAudio); } catch (e) {}
+    }
+
     function setMusicStatus(text) {
       if (musicStatus) musicStatus.textContent = text;
     }
@@ -1085,7 +1108,8 @@
         logDashboardAction('Ambient sound started.');
       }).catch(error => {
         console.error(error);
-        setMusicStatus('Playback blocked until user interaction.');
+        setMusicStatus('Playback blocked until user interaction. Click anywhere to enable audio.');
+        document.addEventListener('click', unlockAudio, { once: true });
       });
     }
 
@@ -1135,6 +1159,8 @@
     function initDashboard() {
       updateDashboardMetrics();
       bindDashboardControls();
+      // ensure one user gesture can unlock audio on some browsers
+      try { document.addEventListener('click', unlockAudio, { once: true }); } catch (e) {}
       logDashboardAction('Dashboard controls initialized.');
     }
 
