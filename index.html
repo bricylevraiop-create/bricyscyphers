@@ -5,291 +5,468 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bricy's Hub</title>
   <style>
-    * { box-sizing: border-box; }
+    :root {
+      color-scheme: dark;
+      --bg: #050102;
+      --bg-gradient: linear-gradient(180deg, #080408 0%, #040204 100%);
+      --surface: rgba(18, 0, 0, 0.92);
+      --surface-soft: rgba(24, 0, 0, 0.76);
+      --surface-strong: rgba(32, 0, 0, 0.98);
+      --text: #f5ede7;
+      --muted: rgba(245, 235, 230, 0.70);
+      --accent: #a21e3c;
+      --accent-strong: #70182d;
+      --accent-soft: rgba(162, 30, 60, 0.18);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 32px 110px rgba(0, 0, 0, 0.42);
+      --radius: 34px;
+      --radius-sm: 18px;
+      --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+      min-height: 100%;
+      background: #050102;
+    }
     body {
       margin: 0;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
-      color: #e0e0e0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: var(--font);
+      color: var(--text);
+      background: radial-gradient(circle at 15% 15%, rgba(255, 0, 0, 0.12), transparent 16%), var(--bg-gradient);
+      overflow-x: hidden;
+      position: relative;
+    }
+    #particleCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.9;
     }
     .app {
-      width: 100%;
-      max-width: 1200px;
-      padding: 28px;
+      position: relative;
+      z-index: 3;
+      width: min(1240px, 100%);
+      margin: 0 auto;
+      padding: 32px 32px 60px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 28px;
     }
     header {
-      text-align: center;
-      color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      z-index: 4;
     }
     header h1 {
-      position: relative;
       margin: 0;
-      font-size: 2.4rem;
-      font-weight: 700;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      font-size: clamp(2.8rem, 4.8vw, 4.8rem);
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      line-height: 1.02;
+      text-transform: uppercase;
+      text-shadow: 0 20px 80px rgba(255, 0, 18, 0.16);
+      position: relative;
     }
     header h1 .backdrop-text {
       position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: rgba(255,255,255,0.32);
-      letter-spacing: 0.18em;
+      top: -46px;
+      left: 0;
+      font-size: 0.92rem;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.18);
+      letter-spacing: 0.28em;
       text-transform: uppercase;
-      z-index: 0;
       pointer-events: none;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.25);
     }
-    header h1 span { position: relative; z-index: 1; }
-    header p { margin: 8px 0 0; font-size: 1rem; opacity: 0.95; }
-
-    .hub-screen { display: grid; gap: 24px; }
-    .hub-grid {
+    header p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+    .topbar-panel {
       display: grid;
-      gap: 16px;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+      gap: 22px;
+      z-index: 4;
     }
-    .tool-card {
+    .topbar-card {
+      position: relative;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      padding: 22px;
-      border-radius: 18px;
-      border: 1px solid #333;
-      background: #16213e;
-      color: #e0e0e0;
-      cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-      text-align: left;
-      min-height: 150px;
+      gap: 18px;
+      padding: 28px;
+      border-radius: 34px;
+      border: 1px solid var(--border);
+      background: rgba(15, 0, 0, 0.86);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(24px);
+      overflow: hidden;
     }
-    .tool-card:hover {
-      transform: translateY(-2px);
-      border-color: #7a7a7a;
-      background: #1c2841;
+    .topbar-card::before {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      background: radial-gradient(circle at top right, rgba(255, 24, 24, 0.16), transparent 22%);
+      pointer-events: none;
     }
-    .tool-card h2 { margin: 0 0 10px; font-size: 1.2rem; color: #fff; }
-    .tool-card p { margin: 0; color: #b0b0b0; line-height: 1.5; }
-
-    .tool-screen { display: block; }
-    .hub-actions {
+    .panel-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      z-index: 2;
+    }
+    .topbar-card h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #ff9898;
+    }
+    .topbar-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.75;
+    }
+    .music-row {
       display: flex;
-      justify-content: flex-end;
-      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      justify-content: space-between;
     }
-    .tool-header {
+    .music-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .music-controls button {
+      min-width: 48px;
+      min-height: 48px;
+      border: none;
+      border-radius: 16px;
+      background: rgba(20, 10, 15, 0.72);
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+    }
+    .music-controls button:hover {
+      transform: translateY(-2px);
+      background: rgba(162, 30, 60, 0.28);
+      box-shadow: 0 24px 44px rgba(162, 30, 60, 0.20);
+    }
+    .music-slider {
+      width: 160px;
+      accent-color: var(--accent);
+    }
+    .volume-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    .music-status {
+      color: var(--muted);
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .hub-screen {
+      display: grid;
+      gap: 28px;
+    }
+    .hub-search-card {
+      padding: 28px;
+      border-radius: 34px;
+      border: 1px solid var(--border);
+      background: rgba(18, 0, 0, 0.88);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(24px);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .search-box input {
+      flex: 1;
+      min-width: 220px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(10, 0, 0, 0.76);
+      color: var(--text);
+      padding: 16px 18px;
+      font-size: 1rem;
+      outline: none;
+    }
+    .search-box input::placeholder { color: rgba(245, 235, 230, 0.42); }
+    .search-results {
+      display: grid;
+      gap: 12px;
+    }
+    .search-result {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
+      gap: 12px;
+      padding: 18px 20px;
+      border-radius: 24px;
+      background: rgba(8, 0, 0, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text);
     }
-    .hidden { display: none !important; }
-    .main {
-      background: #1a1a2e;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      overflow: hidden;
+    .search-result h3 { margin: 0; font-size: 1rem; }
+    .search-result p { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.45; }
+    .search-result button { border: none; border-radius: 14px; background: rgba(255, 0, 0, 0.20); color: #fff; padding: 10px 14px; cursor: pointer; }
+    .hub-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
+      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     }
-    .left-panel { padding: 28px; border-right: 1px solid #333; background: #16213e; }
-    .right-panel { padding: 28px; background: #1a1a2e; display: flex; flex-direction: column; gap: 16px; }
-    .section-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #7a7a7a;
-      margin: 0 0 12px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #7a7a7a;
-    }
-    .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
-    label { font-size: 0.95rem; font-weight: 600; color: #e0e0e0; }
-    textarea, input, select {
-      width: 100%;
-      border-radius: 10px;
-      border: 2px solid #333;
-      background: #0f0f1e;
-      color: #e0e0e0;
-      font-size: 0.95rem;
-      padding: 12px 14px;
-      font-family: inherit;
-      transition: border-color 0.2s ease;
-    }
-    textarea, input, select:focus { border-color: #7a7a7a; outline: none; }
-    textarea { resize: vertical; min-height: 120px; font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace; }
-    .algo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
-    .algo-btn {
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 2px solid #333;
-      background: #0f0f1e;
-      color: #e0e0e0;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: center;
-    }
-    .algo-btn:hover { border-color: #7a7a7a; background: #1a2a4e; }
-    .algo-btn.active { background: #7a7a7a; color: #000; border-color: #7a7a7a; }
-    .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-    button.primary {
-      background: #7a7a7a;
-      color: #000;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    button.primary:hover {
-      background: #8a8a8a;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(122, 122, 122, 0.3);
-    }
-    button.secondary {
-      background: #2a3a5a;
-      color: #e0e0e0;
-      border: 2px solid #333;
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    button.secondary:hover { background: #3a4a6a; border-color: #7a7a7a; }
-    .output-card {
-      background: #0f0f1e;
-      border: 2px solid #333;
-      border-radius: 10px;
-      padding: 16px;
+    .tool-card {
+      position: relative;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      flex: 1;
-    }
-    .output-label {
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #7a7a7a;
-    }
-    .output-text {
-      background: #16213e;
-      border-radius: 8px;
-      padding: 12px;
-      min-height: 80px;
-      border: 1px solid #333;
-      font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace;
-      font-size: 0.9rem;
-      color: #e0e0e0;
-      white-space: pre-wrap;
-      word-break: break-word;
-      overflow-y: auto;
-      max-height: 200px;
-    }
-    .brute-list {
-      max-height: 300px;
-      overflow-y: auto;
-      background: #16213e;
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 8px;
-    }
-    .brute-item {
-      padding: 8px 10px;
-      border-bottom: 1px solid #2a3a5a;
-      font-size: 0.9rem;
-      font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace;
-      color: #e0e0e0;
-    }
-    .brute-item:last-child { border-bottom: none; }
-    .note { font-size: 0.85rem; color: #999; margin-top: -4px; }
-    .copy-button {
-      align-self: flex-end;
-      background: #7a7a7a;
-      color: #000;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      justify-content: space-between;
+      min-height: 190px;
+      padding: 32px;
+      border-radius: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: linear-gradient(180deg, rgba(22, 0, 0, 0.96), rgba(10, 0, 0, 0.74));
+      color: var(--text);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: transform 0.32s ease, border-color 0.32s ease, box-shadow 0.32s ease, background 0.32s ease;
+      box-shadow: 0 30px 110px rgba(0, 0, 0, 0.26);
+      backdrop-filter: blur(24px);
+      overflow: hidden;
     }
-    .copy-button:hover { background: #8a8a8a; }
-    @media (max-width: 1000px) {
-      .main { grid-template-columns: 1fr; }
-      .left-panel { border-right: none; border-bottom: 1px solid #333; }
-      .algo-grid { grid-template-columns: repeat(3, 1fr); }
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 18% 22%, rgba(255, 20, 20, 0.12), transparent 18%), radial-gradient(circle at 82% 86%, rgba(255, 30, 30, 0.1), transparent 24%);
+      pointer-events: none;
     }
-    @media (max-width: 600px) {
-      .app { padding: 16px; }
-      header h1 { font-size: 1.8rem; }
-      .algo-grid { grid-template-columns: 1fr 1fr; }
-      .left-panel, .right-panel { padding: 18px; }
+    .tool-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255, 40, 40, 0.38);
+      box-shadow: 0 40px 120px rgba(255, 6, 6, 0.18);
+      background: linear-gradient(180deg, rgba(40, 0, 0, 0.98), rgba(18, 0, 0, 0.82));
+    }
+    .tool-card h2 { margin: 0 0 14px; font-size: 1.45rem; color: #fff; }
+    .tool-card p { margin: 0; color: rgba(245, 230, 230, 0.84); line-height: 1.72; font-size: 0.96rem; }
+    .tool-screen { display: block; }
+    .tool-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; flex-wrap: wrap; padding-bottom: 10px; }
+    .tool-header h1 { margin: 0; font-size: clamp(2rem, 4vw, 3.6rem); line-height: 1.03; letter-spacing: 0.08em; }
+    .tool-header p { margin: 12px 0 0; color: var(--muted); max-width: 760px; }
+    .hidden { display: none !important; }
+    .main {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 0;
+      background: rgba(14, 0, 0, 0.92);
+      border-radius: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(24px);
+      min-height: 520px;
+    }
+    .main::before { content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 24, 24, 0.08), transparent 16%);
+      pointer-events: none;
+    }
+    .left-panel, .right-panel { position: relative; padding: 38px; }
+    .left-panel { border-right: 1px solid rgba(255, 255, 255, 0.06); background: rgba(24, 0, 0, 0.80); }
+    .right-panel { background: rgba(10, 0, 0, 0.62); display: flex; flex-direction: column; gap: 24px; }
+    .section-title { margin: 0 0 24px; color: rgba(255, 255, 255, 0.76); font-size: 0.84rem; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; }
+    .field { display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px; }
+    label { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+    textarea, input, select {
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(10, 0, 0, 0.78);
+      color: var(--text);
+      font-size: 0.95rem;
+      padding: 16px 18px;
+      font-family: inherit;
+      transition: border-color 0.28s ease, transform 0.28s ease, box-shadow 0.28s ease;
+    }
+    textarea:focus, input:focus, select:focus { border-color: rgba(255, 90, 90, 0.48); box-shadow: 0 0 0 4px rgba(255, 80, 80, 0.12); transform: translateY(-1px); outline: none; }
+    textarea { resize: vertical; min-height: 130px; font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace; }
+    .algo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+    .algo-btn { padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(15, 0, 0, 0.72); color: var(--text); font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.28s ease; }
+    .algo-btn:hover { border-color: rgba(162, 30, 60, 0.4); background: rgba(162, 30, 60, 0.08); transform: translateY(-1px); }
+    .algo-btn.active { background: rgba(162, 30, 60, 0.22); border-color: #8d1a34; color: #fff; box-shadow: 0 12px 34px rgba(162, 30, 60, 0.14); }
+    .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+    button.primary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: none; border-radius: 20px; background: linear-gradient(135deg, var(--accent), var(--accent-strong)); color: #fff; padding: 16px 22px; font-size: 0.95rem; font-weight: 800; cursor: pointer; box-shadow: 0 20px 70px rgba(162, 30, 60, 0.22); }
+    button.primary:hover { transform: translateY(-2px); box-shadow: 0 24px 92px rgba(162, 30, 60, 0.28); }
+    button.secondary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 20px; background: rgba(18, 0, 0, 0.72); color: var(--text); padding: 16px 22px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+    button.secondary:hover { transform: translateY(-1px); border-color: rgba(162, 30, 60, 0.36); background: rgba(162, 30, 60, 0.12); }
+    .output-card { background: rgba(10, 0, 0, 0.76); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 26px; padding: 28px; display: flex; flex-direction: column; gap: 16px; flex: 1; box-shadow: 0 28px 80px rgba(0, 0, 0, 0.22); backdrop-filter: blur(16px); }
+    .output-label { color: rgba(255, 255, 255, 0.78); font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+    .output-text { background: rgba(8, 0, 0, 0.86); border-radius: 20px; padding: 20px; min-height: 92px; border: 1px solid rgba(255, 255, 255, 0.08); font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 0.95rem; color: var(--text); white-space: pre-wrap; word-break: break-word; overflow-y: auto; max-height: 280px; }
+    .brute-list { max-height: 300px; overflow-y: auto; background: rgba(8, 0, 0, 0.74); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 14px; }
+    .brute-item { padding: 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); font-size: 0.92rem; font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace; color: var(--text); }
+    .brute-item:last-child { border-bottom: none; }
+    .note { color: var(--muted); font-size: 0.89rem; line-height: 1.6; margin-top: -4px; }
+    .copy-button { align-self: flex-end; background: rgba(255, 255, 255, 0.92); color: #000; border: none; border-radius: 14px; padding: 12px 16px; font-size: 0.88rem; font-weight: 700; cursor: pointer; }
+    .copy-button:hover { transform: translateY(-1px); background: #fff; }
+    .modal { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(16px); z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .modal.visible { opacity: 1; pointer-events: auto; }
+    .modal-card { width: 100%; max-width: 600px; border-radius: 34px; background: rgba(12, 0, 0, 0.96); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 42px 150px rgba(0, 0, 0, 0.55); padding: 36px; position: relative; overflow: hidden; }
+    .modal-card::before { content: ''; position: absolute; inset: -18px; background: radial-gradient(circle at top left, rgba(255, 0, 0, 0.16), transparent 18%); filter: blur(34px); pointer-events: none; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+    .modal-header h2 { margin: 0; color: #fff; font-size: 1.6rem; }
+    .modal-actions { display: grid; gap: 14px; margin-top: 24px; }
+    .modal-button { width: 100%; border: none; border-radius: 18px; padding: 18px 22px; font-size: 1rem; font-weight: 700; cursor: pointer; color: #fff; background: rgba(255, 20, 20, 0.18); box-shadow: 0 18px 40px rgba(255, 0, 0, 0.12); }
+    .modal-button:hover { transform: translateY(-2px); box-shadow: 0 24px 44px rgba(255, 0, 0, 0.18); }
+    .modal-actions .secondary { background: rgba(255, 255, 255, 0.08); color: #fff; }
+    .animate-reveal { opacity: 0; transform: translateY(34px) scale(0.985); transition: opacity 0.85s ease, transform 0.85s ease; will-change: opacity, transform; }
+    .reveal-visible { opacity: 1; transform: translateY(0) scale(1); }
+    .float { animation: floatMotion 8s ease-in-out infinite; }
+    @keyframes floatMotion { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    .metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .metric-card { padding: 24px; border-radius: 28px; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(15, 0, 0, 0.82); box-shadow: 0 18px 46px rgba(0, 0, 0, 0.22); }
+    .metric-card h3 { margin: 0 0 10px; font-size: 0.88rem; color: #ff9b9b; text-transform: uppercase; letter-spacing: 0.16em; }
+    .metric-card p { margin: 0; font-size: 2.2rem; color: #fff; font-weight: 800; }
+    .activity-log { display: grid; gap: 12px; max-height: 260px; overflow-y: auto; background: rgba(8, 0, 0, 0.82); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 22px; padding: 18px; }
+    .activity-item { padding: 14px 16px; border-radius: 18px; background: rgba(255, 255, 255, 0.03); color: var(--text); font-size: 0.92rem; line-height: 1.5; }
+    @media (max-width: 1080px) { .topbar-panel, .main, .metric-grid { grid-template-columns: 1fr; } .hub-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); } }
+    @media (max-width: 760px) {
+      .app { padding: 24px 18px 46px; }
+      header h1 { font-size: 3rem; }
+      .music-row { flex-direction: column; align-items: stretch; }
+      .music-controls { width: 100%; justify-content: flex-start; }
+      .music-slider { width: 100%; }
+      .algo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .action-buttons { grid-template-columns: 1fr; }
+      .left-panel, .right-panel { padding: 28px; }
+    }
+    @media (max-width: 520px) {
+      .app { padding: 18px 14px 40px; }
+      header h1 { font-size: 2.4rem; }
+      .tool-card { min-height: 170px; padding: 24px; }
+      .topbar-card { padding: 22px; }
+      .music-controls button { width: 100%; }
+      .search-box { flex-direction: column; }
     }
   </style>
 </head>
 <body>
+  <canvas id="particleCanvas"></canvas>
+  <audio id="bgAudio" src="playthatsound.mp3" loop preload="auto"></audio>
   <div class="app">
+    <header>
+      <h1>Bricy's Hub</h1>
+      <p id="hubWelcome">Choose a tool to launch. More projects will be added here over time.</p>
+    </header>
+    <div class="topbar-panel">
+      <div class="topbar-card">
+        <span class="panel-chip">Ambient Pulse</span>
+        <h2>Soundscape Control</h2>
+        <p>Low-volume ambient music enhances the cyber dashboard. Play, pause, mute, and adjust volume anytime.</p>
+        <div class="music-row">
+          <div class="music-controls">
+            <button type="button" id="musicPlay">Play</button>
+            <button type="button" id="musicPause">Pause</button>
+            <button type="button" id="musicMute">Mute</button>
+          </div>
+          <label class="volume-label">Volume <input id="musicVolume" class="music-slider" type="range" min="0" max="1" step="0.01" value="0.22"></label>
+        </div>
+        <div class="music-status" id="musicStatus">Paused. Start the ambient soundscape when ready.</div>
+      </div>
+      <div class="topbar-card">
+        <span class="panel-chip">Live Metrics</span>
+        <h2>Dashboard Insights</h2>
+        <div class="metric-grid">
+          <div class="metric-card"><h3>Available Tools</h3><p id="activeToolCount">10</p></div>
+          <div class="metric-card"><h3>Recent Actions</h3><p id="recentActionCount">1</p></div>
+        </div>
+        <div class="activity-log" id="activityLog"><div class="activity-item">Dashboard initialized.</div></div>
+      </div>
+    </div>
     <div class="hub-screen">
-      <header>
-        <h1>Bricy's Hub</h1>
-        <p id="hubWelcome">Choose a tool to launch. More projects will be added here over time.</p>
-      </header>
+      <div class="hub-search-card">
+        <div class="search-box">
+          <input id="toolSearch" type="search" placeholder="Search tools or quick actions..." autocomplete="off" />
+          <button type="button" class="secondary" id="clearSearch">Clear</button>
+        </div>
+        <div class="search-results" id="searchResults"></div>
+      </div>
       <div class="hub-grid">
-        <button class="tool-card" data-tool="cipher">
+        <button type="button" class="tool-card" data-tool="cipher">
           <h2>Cipher Studio</h2>
           <p>Encrypt, decrypt, and analyze text with multiple cipher algorithms.</p>
         </button>
-        <button class="tool-card" data-tool="qr">
+        <button type="button" class="tool-card" data-tool="qr">
           <h2>QR Code Generator</h2>
           <p>Generate a QR code instantly from any link.</p>
         </button>
-        <button class="tool-card" data-tool="htmlbuilder">
+        <button type="button" class="tool-card" data-tool="htmlbuilder">
           <h2>HTML File Builder</h2>
           <p>Create an .html file from raw HTML source and download it instantly.</p>
         </button>
-        <button class="tool-card" data-tool="json">
+        <button type="button" class="tool-card" data-tool="customizer">
+          <h2>Transform</h2>
+          <p>Adjust the page, buttons, and colors for a premium custom HTML download.</p>
+        </button>
+        <button type="button" class="tool-card" data-tool="json">
           <h2>JSON Formatter</h2>
           <p>Validate and pretty-print JSON, and minify for compact output.</p>
         </button>
-        <button class="tool-card" data-tool="image">
+        <button type="button" class="tool-card" data-tool="image">
           <h2>Image Resizer</h2>
           <p>Resize an image client-side and download the result.</p>
         </button>
-        <button class="tool-card" data-tool="password">
+        <button type="button" class="tool-card" data-tool="password">
           <h2>Password Generator</h2>
           <p>Create strong, customizable passwords instantly.</p>
         </button>
-        <button class="tool-card" data-tool="urltools">
+        <button type="button" class="tool-card" data-tool="urltools">
           <h2>URL Encoder/Decoder</h2>
           <p>Encode or decode URL components safely.</p>
         </button>
-        <button class="tool-card" data-tool="colors">
+        <button type="button" class="tool-card" data-tool="colors">
           <h2>Color Extractor</h2>
           <p>Extract dominant colors from an image and copy hex values.</p>
         </button>
-        <button class="tool-card" data-tool="youtube">
-          <h2>YouTube → MP3</h2>
-          <p>Convert YouTube videos to MP3 audio directly from the site.</p>
+        <button type="button" class="tool-card" data-tool="random">
+          <h2>Random Number</h2>
+          <p>Generate a random number quickly from any min and max range.</p>
+        </button>
+        <button type="button" class="tool-card" data-tool="text">
+          <h2>Text Counter</h2>
+          <p>Count words, characters, and lines in any text block.</p>
         </button>
       </div>
     </div>
@@ -477,6 +654,53 @@
       </div>
     </div>
 
+    <div class="random-panel hidden">
+      <div class="main">
+        <div class="left-panel">
+          <div class="section-title">Random Number Generator</div>
+          <div class="field">
+            <label for="randMin">Minimum</label>
+            <input id="randMin" type="number" value="1" />
+          </div>
+          <div class="field">
+            <label for="randMax">Maximum</label>
+            <input id="randMax" type="number" value="100" />
+          </div>
+          <div class="action-buttons">
+            <button class="primary" id="generateRandomBtn">Generate</button>
+            <button class="secondary" id="clearRandomBtn">Clear</button>
+          </div>
+        </div>
+        <div class="right-panel">
+          <div class="output-card">
+            <div class="output-label">Result</div>
+            <div class="output-text" id="randomResult">No number yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-panel hidden">
+      <div class="main">
+        <div class="left-panel">
+          <div class="section-title">Text Counter</div>
+          <div class="field">
+            <textarea id="textCounterInput" placeholder="Paste text here..."></textarea>
+          </div>
+          <div class="action-buttons">
+            <button class="primary" id="countTextBtn">Count</button>
+            <button class="secondary" id="clearTextBtn">Clear</button>
+          </div>
+        </div>
+        <div class="right-panel">
+          <div class="output-card">
+            <div class="output-label">Counts</div>
+            <div class="output-text" id="textResult">No text yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="colors-panel hidden">
       <div class="main">
         <div class="left-panel">
@@ -493,28 +717,6 @@
           <div class="output-card">
             <div class="output-label">Palette</div>
             <div class="output-text" id="colorPalette" style="display:flex;gap:8px;flex-wrap:wrap;min-height:120px;align-items:center;">No colors yet.</div>
-            <div id="selectedColorHex" class="note" style="margin-top:12px;">Click a swatch to copy the exact hex code.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="youtube-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">YouTube to MP3</div>
-          <div class="field">
-            <input id="youtubeUrlInput" type="url" placeholder="Paste YouTube video URL" />
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="youtubeConvertBtn">Convert to MP3</button>
-            <button class="secondary" id="youtubeClearBtn">Clear</button>
-          </div>
-          <div id="youtubeStatus" class="note">Paste a YouTube link and convert it to MP3.</div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Download</div>
-            <div class="output-text" id="youtubeOutput">Waiting for a YouTube URL.</div>
           </div>
         </div>
       </div>
@@ -546,10 +748,96 @@
         </div>
       </div>
     </div>
-
+    <div class="customizer-panel hidden">
+      <div class="main">
+        <div class="left-panel">
+          <div class="section-title">Website Customizer</div>
+          <div class="field">
+            <label for="siteTitleInput">Site title</label>
+            <input id="siteTitleInput" type="text" value="Bricy's Hub" />
+          </div>
+          <div class="field">
+            <label for="siteSubtitleInput">Subtitle</label>
+            <textarea id="siteSubtitleInput" rows="3">Choose a tool to launch. More projects will be added here over time.</textarea>
+          </div>
+          <div class="field">
+            <label for="brandTextInput">Accent text</label>
+            <input id="brandTextInput" type="text" value="Bricy's" />
+          </div>
+          <div class="section-title">Colors</div>
+          <div class="field">
+            <label for="bgStartInput">Background start</label>
+            <input id="bgStartInput" type="color" value="#0f0f1e" />
+          </div>
+          <div class="field">
+            <label for="bgEndInput">Background end</label>
+            <input id="bgEndInput" type="color" value="#1a1a2e" />
+          </div>
+          <div class="field">
+            <label for="textColorInput">Text color</label>
+            <input id="textColorInput" type="color" value="#e0e0e0" />
+          </div>
+          <div class="field">
+            <label for="cardBgInput">Card background</label>
+            <input id="cardBgInput" type="color" value="#16213e" />
+          </div>
+          <div class="field">
+            <label for="cardTextInput">Card text color</label>
+            <input id="cardTextInput" type="color" value="#e0e0e0" />
+          </div>
+        </div>
+        <div class="right-panel">
+          <div class="output-card">
+            <div class="output-label">Cards / Buttons</div>
+            <div class="field">
+              <label for="card1Label">Button 1 title</label>
+              <input id="card1Label" type="text" value="Cipher Studio" />
+            </div>
+            <div class="field">
+              <label for="card1Desc">Button 1 description</label>
+              <textarea id="card1Desc" rows="2">Encrypt, decrypt, and analyze text with multiple cipher algorithms.</textarea>
+            </div>
+            <div class="field">
+              <label for="card2Label">Button 2 title</label>
+              <input id="card2Label" type="text" value="QR Code Generator" />
+            </div>
+            <div class="field">
+              <label for="card2Desc">Button 2 description</label>
+              <textarea id="card2Desc" rows="2">Generate a QR code instantly from any link.</textarea>
+            </div>
+            <div class="field">
+              <label for="card3Label">Button 3 title</label>
+              <input id="card3Label" type="text" value="HTML File Builder" />
+            </div>
+            <div class="field">
+              <label for="card3Desc">Button 3 description</label>
+              <textarea id="card3Desc" rows="2">Create an .html file from raw HTML source and download it instantly.</textarea>
+            </div>
+            <div class="field">
+              <label for="card4Label">Button 4 title</label>
+              <input id="card4Label" type="text" value="JSON Formatter" />
+            </div>
+            <div class="field">
+              <label for="card4Desc">Button 4 description</label>
+              <textarea id="card4Desc" rows="2">Validate and pretty-print JSON, and minify for compact output.</textarea>
+            </div>
+          </div>
+          <div class="output-card">
+            <div class="output-label">Download</div>
+            <div class="output-text" id="customHtmlDownloadWrapper" style="display:flex;justify-content:center;align-items:center;min-height:180px;">
+              <a id="customHtmlDownloadLink" href="#" style="display:none;color:#7a7a7a;text-decoration:underline;" download>Download Customized HTML</a>
+            </div>
+            <div id="customizerStatus" class="note">Customize the page and click "Create Customized HTML".</div>
+          </div>
+          <div class="action-buttons">
+            <button class="primary" id="generateCustomHtmlBtn">Create Customized HTML</button>
+            <button class="secondary" id="resetCustomizerBtn">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
   <script>
     const inputText = document.getElementById('inputText');
     const keyInput = document.getElementById('keyInput');
@@ -565,6 +853,7 @@
     const clearButton = document.getElementById('clearButton');
     const algoButtons = document.querySelectorAll('.algo-btn');
     const toolCards = document.querySelectorAll('.tool-card');
+    const hubGrid = document.querySelector('.hub-grid');
     const hubScreen = document.querySelector('.hub-screen');
     const toolScreen = document.querySelector('.tool-screen');
     const cipherPanel = document.querySelector('.cipher-panel');
@@ -572,7 +861,21 @@
     const backButton = document.getElementById('backButton');
     const toolTitle = document.getElementById('toolTitle');
     const toolDesc = document.getElementById('toolDesc');
+    let currentQrObjectUrl = null;
+    let currentHtmlObjectUrl = null;
+    let currentImagePreviewUrl = null;
     const qrLinkInput = document.getElementById('qrLinkInput');
+    const randomPanel = document.querySelector('.random-panel');
+    const textPanel = document.querySelector('.text-panel');
+    const randMin = document.getElementById('randMin');
+    const randMax = document.getElementById('randMax');
+    const generateRandomBtn = document.getElementById('generateRandomBtn');
+    const clearRandomBtn = document.getElementById('clearRandomBtn');
+    const randomResult = document.getElementById('randomResult');
+    const textCounterInput = document.getElementById('textCounterInput');
+    const countTextBtn = document.getElementById('countTextBtn');
+    const textResult = document.getElementById('textResult');
+    const clearTextBtn = document.getElementById('clearTextBtn');
     const generateQrButton = document.getElementById('generateQrButton');
     const clearQrButton = document.getElementById('clearQrButton');
     const qrStatus = document.getElementById('qrStatus');
@@ -583,6 +886,27 @@
     const clearHtmlButton = document.getElementById('clearHtmlButton');
     const htmlStatus = document.getElementById('htmlStatus');
     const htmlDownloadLink = document.getElementById('htmlDownloadLink');
+    const customizerPanel = document.querySelector('.customizer-panel');
+    const siteTitleInput = document.getElementById('siteTitleInput');
+    const siteSubtitleInput = document.getElementById('siteSubtitleInput');
+    const brandTextInput = document.getElementById('brandTextInput');
+    const bgStartInput = document.getElementById('bgStartInput');
+    const bgEndInput = document.getElementById('bgEndInput');
+    const textColorInput = document.getElementById('textColorInput');
+    const cardBgInput = document.getElementById('cardBgInput');
+    const cardTextInput = document.getElementById('cardTextInput');
+    const card1Label = document.getElementById('card1Label');
+    const card1Desc = document.getElementById('card1Desc');
+    const card2Label = document.getElementById('card2Label');
+    const card2Desc = document.getElementById('card2Desc');
+    const card3Label = document.getElementById('card3Label');
+    const card3Desc = document.getElementById('card3Desc');
+    const card4Label = document.getElementById('card4Label');
+    const card4Desc = document.getElementById('card4Desc');
+    const generateCustomHtmlBtn = document.getElementById('generateCustomHtmlBtn');
+    const resetCustomizerBtn = document.getElementById('resetCustomizerBtn');
+    const customHtmlDownloadLink = document.getElementById('customHtmlDownloadLink');
+    const customizerStatus = document.getElementById('customizerStatus');
     const jsonPanel = document.querySelector('.json-panel');
     const jsonInput = document.getElementById('jsonInput');
     const formatJsonBtn = document.getElementById('formatJsonBtn');
@@ -621,17 +945,24 @@
     const extractColorsBtn = document.getElementById('extractColorsBtn');
     const clearColorsBtn = document.getElementById('clearColorsBtn');
     const colorPalette = document.getElementById('colorPalette');
-    const selectedColorHex = document.getElementById('selectedColorHex');
-
-    const youtubePanel = document.querySelector('.youtube-panel');
-    const youtubeUrlInput = document.getElementById('youtubeUrlInput');
-    const youtubeConvertBtn = document.getElementById('youtubeConvertBtn');
-    const youtubeClearBtn = document.getElementById('youtubeClearBtn');
-    const youtubeStatus = document.getElementById('youtubeStatus');
-    const youtubeOutput = document.getElementById('youtubeOutput');
-
     const copyEncryptBtn = document.getElementById('copyEncrypt');
     const copyDecryptBtn = document.getElementById('copyDecrypt');
+    const toolSearch = document.getElementById('toolSearch');
+    const clearSearch = document.getElementById('clearSearch');
+    const searchResults = document.getElementById('searchResults');
+    const musicPlay = document.getElementById('musicPlay');
+    const musicPause = document.getElementById('musicPause');
+    const musicMute = document.getElementById('musicMute');
+    const musicVolume = document.getElementById('musicVolume');
+    const musicStatus = document.getElementById('musicStatus');
+    const bgAudio = document.getElementById('bgAudio');
+    const activeToolCount = document.getElementById('activeToolCount');
+    const recentActionCount = document.getElementById('recentActionCount');
+    const activityLog = document.getElementById('activityLog');
+    const particleCanvas = document.getElementById('particleCanvas');
+    const particleCtx = particleCanvas ? particleCanvas.getContext('2d') : null;
+    const particles = [];
+    const particleCount = 64;
 
     function showHub() {
       toolScreen.classList.add('hidden');
@@ -649,7 +980,7 @@
       if (passwordPanel) passwordPanel.classList.add('hidden');
       if (urlPanel) urlPanel.classList.add('hidden');
       if (colorsPanel) colorsPanel.classList.add('hidden');
-      if (youtubePanel) youtubePanel.classList.add('hidden');
+      if (customizerPanel) customizerPanel.classList.add('hidden');
 
       // show selected
       if (toolName === 'cipher') cipherPanel.classList.remove('hidden');
@@ -660,7 +991,151 @@
       else if (toolName === 'password' && passwordPanel) passwordPanel.classList.remove('hidden');
       else if (toolName === 'urltools' && urlPanel) urlPanel.classList.remove('hidden');
       else if (toolName === 'colors' && colorsPanel) colorsPanel.classList.remove('hidden');
-      else if (toolName === 'youtube' && youtubePanel) youtubePanel.classList.remove('hidden');
+      else if (toolName === 'customizer' && customizerPanel) customizerPanel.classList.remove('hidden');
+    }
+
+    function logDashboardAction(message) {
+      if (!activityLog) return;
+      const item = document.createElement('div');
+      item.className = 'activity-item';
+      item.textContent = message;
+      activityLog.prepend(item);
+      const count = activityLog.querySelectorAll('.activity-item').length;
+      if (recentActionCount) recentActionCount.textContent = count.toString();
+    }
+
+    function updateDashboardMetrics() {
+      if (activeToolCount) activeToolCount.textContent = toolCards.length.toString();
+    }
+
+    function renderSearchResults(query) {
+      if (!searchResults) return;
+      const normalized = query.trim().toLowerCase();
+      if (!normalized) {
+        searchResults.innerHTML = '';
+        return;
+      }
+      const matches = [];
+      toolCards.forEach(card => {
+        const title = card.querySelector('h2')?.textContent || '';
+        const desc = card.querySelector('p')?.textContent || '';
+        const titleLower = title.toLowerCase();
+        const descLower = desc.toLowerCase();
+        if (titleLower.includes(normalized) || descLower.includes(normalized) || card.dataset.tool?.includes(normalized)) {
+          matches.push({ tool: card.dataset.tool, title, desc });
+        }
+      });
+      if (!matches.length) {
+        searchResults.innerHTML = '<div class="search-result"><h3>No matching tools found</h3><p>Try another keyword.</p></div>';
+        return;
+      }
+      searchResults.innerHTML = matches.map(entry => `
+        <div class="search-result">
+          <div>
+            <h3>${entry.title}</h3>
+            <p>${entry.desc}</p>
+          </div>
+          <button type="button" data-tool="${entry.tool}">Open</button>
+        </div>
+      `).join('');
+    }
+
+    let isMuted = false;
+
+    function initAmbientAudio() {
+      if (!bgAudio) return;
+      bgAudio.volume = parseFloat(musicVolume?.value || 0.22);
+      bgAudio.muted = isMuted;
+      bgAudio.loop = true;
+    }
+
+    function setMusicStatus(text) {
+      if (musicStatus) musicStatus.textContent = text;
+    }
+
+    function setMusicVolume(value) {
+      if (!bgAudio) return;
+      bgAudio.volume = parseFloat(value);
+      if (isMuted) {
+        bgAudio.muted = true;
+      }
+    }
+
+    function toggleMute() {
+      if (!bgAudio) return;
+      isMuted = !isMuted;
+      bgAudio.muted = isMuted;
+      if (isMuted) {
+        if (musicMute) musicMute.textContent = 'Unmute';
+        setMusicStatus('Ambient sound is muted.');
+      } else {
+        if (musicMute) musicMute.textContent = 'Mute';
+        setMusicStatus('Ambient sound is unmuted.');
+      }
+    }
+
+    function startAmbientSound() {
+      if (!bgAudio) {
+        setMusicStatus('Audio source unavailable.');
+        return;
+      }
+      initAmbientAudio();
+      bgAudio.play().then(() => {
+        setMusicStatus('Ambient sound is playing.');
+        logDashboardAction('Ambient sound started.');
+      }).catch(error => {
+        console.error(error);
+        setMusicStatus('Playback blocked until user interaction.');
+      });
+    }
+
+    function pauseAmbientSound() {
+      if (!bgAudio) return;
+      bgAudio.pause();
+      setMusicStatus('Ambient sound paused.');
+      logDashboardAction('Ambient sound paused.');
+    }
+
+    function bindDashboardControls() {
+      if (toolSearch) {
+        toolSearch.addEventListener('input', () => {
+          renderSearchResults(toolSearch.value);
+        });
+      }
+      if (clearSearch) {
+        clearSearch.addEventListener('click', () => {
+          if (toolSearch) toolSearch.value = '';
+          renderSearchResults('');
+          logDashboardAction('Search cleared.');
+        });
+      }
+      if (searchResults) {
+        searchResults.addEventListener('click', event => {
+          const action = event.target.closest('button[data-tool]');
+          if (action) {
+            selectTool(action.dataset.tool);
+            renderSearchResults('');
+            if (toolSearch) toolSearch.value = '';
+            logDashboardAction(`Opened tool: ${action.dataset.tool}`);
+          }
+        });
+      }
+      if (musicPlay) musicPlay.addEventListener('click', startAmbientSound);
+      if (musicPause) musicPause.addEventListener('click', pauseAmbientSound);
+      if (musicMute) musicMute.addEventListener('click', toggleMute);
+      if (musicVolume) musicVolume.addEventListener('input', event => {
+        setMusicVolume(event.target.value);
+        setMusicStatus(`Volume set to ${Math.round(parseFloat(event.target.value) * 100)}%.`);
+      });
+      if (musicStatus && !musicStatus.textContent.trim()) {
+        musicStatus.textContent = 'Ambient sound ready. Press play to start.';
+      }
+    }
+
+    function initDashboard() {
+      updateDashboardMetrics();
+      bindDashboardControls();
+      logDashboardAction('Dashboard controls initialized.');
     }
 
     function selectTool(toolName) {
@@ -675,6 +1150,9 @@
       } else if (toolName === 'htmlbuilder') {
         toolTitle.textContent = '📝 HTML File Builder';
         toolDesc.textContent = 'Create a downloadable HTML file from raw HTML source.';
+      } else if (toolName === 'customizer') {
+        toolTitle.textContent = '🛠️ Transform';
+        toolDesc.textContent = 'Tune the page, buttons, and colors for a cinematic custom HTML download.';
       } else if (toolName === 'json') {
         toolTitle.textContent = '🗄️ JSON Formatter';
         toolDesc.textContent = 'Validate, pretty-print, and minify JSON.';
@@ -687,12 +1165,15 @@
       } else if (toolName === 'urltools') {
         toolTitle.textContent = '🔗 URL Encoder / Decoder';
         toolDesc.textContent = 'Encode or decode URL components safely.';
+      } else if (toolName === 'random') {
+        toolTitle.textContent = '🎲 Random Number Generator';
+        toolDesc.textContent = 'Generate a random number between a min and max range.';
+      } else if (toolName === 'text') {
+        toolTitle.textContent = '📊 Text Counter';
+        toolDesc.textContent = 'Count words, characters, and lines in any text block.';
       } else if (toolName === 'colors') {
         toolTitle.textContent = '🎨 Color Extractor';
         toolDesc.textContent = 'Extract dominant colors from an image and copy hex values.';
-      } else if (toolName === 'youtube') {
-        toolTitle.textContent = '🎵 YouTube → MP3';
-        toolDesc.textContent = 'Convert YouTube videos to MP3 audio directly from the site.';
       }
       showToolPanel(toolName);
     }
@@ -700,112 +1181,103 @@
     toolCards.forEach(card => {
       card.addEventListener('click', () => selectTool(card.dataset.tool));
     });
-
-    function downloadBlob(blob, filename) {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    async function convertYouTubeToMp3() {
-      const url = (youtubeUrlInput.value || '').trim();
-      if (!url) {
-        youtubeStatus.textContent = 'Enter a YouTube video URL first.';
-        return;
-      }
-      youtubeStatus.textContent = 'Converting... please wait.';
-      youtubeOutput.textContent = 'Processing your download.';
-      try {
-        const response = await fetch(`http://localhost:3000/api/ytmp3?url=${encodeURIComponent(url)}`);
-        if (!response.ok) {
-          const data = await response.json().catch(() => null);
-          youtubeStatus.textContent = data && data.error ? data.error : 'Conversion failed.';
-          youtubeOutput.textContent = 'Unable to download audio.';
-          return;
+    if (hubGrid) {
+      hubGrid.addEventListener('click', event => {
+        const card = event.target.closest('.tool-card');
+        if (card && card.dataset.tool) {
+          selectTool(card.dataset.tool);
         }
-        const blob = await response.blob();
-        const filename = 'youtube-audio.mp3';
-        downloadBlob(blob, filename);
-        youtubeStatus.textContent = 'Conversion complete! The download should start automatically.';
-        youtubeOutput.textContent = `Downloaded ${filename}`;
-      } catch (error) {
-        youtubeStatus.textContent = 'Conversion failed. Make sure the local server is running.';
-        youtubeOutput.textContent = error.message || 'Unexpected error.';
-        console.error('YouTube conversion error:', error);
-      }
+      });
     }
 
-    if (youtubeConvertBtn) youtubeConvertBtn.addEventListener('click', convertYouTubeToMp3);
-    if (youtubeClearBtn) youtubeClearBtn.addEventListener('click', () => {
-      youtubeUrlInput.value = '';
-      youtubeStatus.textContent = 'Paste a YouTube link and convert it to MP3.';
-      youtubeOutput.textContent = 'Waiting for a YouTube URL.';
-    });
-
-    let currentQrObjectUrl = null;
-    let currentHtmlObjectUrl = null;
-    let currentMp4ObjectUrl = null;
-
-    function writeString(view, offset, string) {
-      for (let i = 0; i < string.length; i += 1) {
-        view.setUint8(offset + i, string.charCodeAt(i));
-      }
+    function setupScrollReveal() {
+      const items = document.querySelectorAll('.tool-card, .main, .output-card');
+      items.forEach(el => el.classList.add('animate-reveal'));
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('reveal-visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      items.forEach(el => observer.observe(el));
     }
 
-    function encodeWav(audioBuffer) {
-      const numChannels = audioBuffer.numberOfChannels;
-      const sampleRate = audioBuffer.sampleRate;
-      const sampleCount = audioBuffer.length;
-      const blockAlign = numChannels * 2;
-      const byteRate = sampleRate * blockAlign;
-      const dataSize = sampleCount * blockAlign;
-      const buffer = new ArrayBuffer(44 + dataSize);
-      const view = new DataView(buffer);
+    function resizeParticleCanvas() {
+      if (!particleCanvas) return;
+      particleCanvas.width = window.innerWidth;
+      particleCanvas.height = window.innerHeight;
+    }
 
-      writeString(view, 0, 'RIFF');
-      view.setUint32(4, 36 + dataSize, true);
-      writeString(view, 8, 'WAVE');
-      writeString(view, 12, 'fmt ');
-      view.setUint32(16, 16, true);
-      view.setUint16(20, 1, true);
-      view.setUint16(22, numChannels, true);
-      view.setUint32(24, sampleRate, true);
-      view.setUint32(28, byteRate, true);
-      view.setUint16(32, blockAlign, true);
-      view.setUint16(34, 16, true);
-      writeString(view, 36, 'data');
-      view.setUint32(40, dataSize, true);
+    function createParticle() {
+      return {
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: -Math.random() * 0.28 - 0.12,
+        size: Math.random() * 2.5 + 1.2,
+        alpha: Math.random() * 0.4 + 0.18
+      };
+    }
 
-      let offset = 44;
-      const channels = [];
-      for (let channel = 0; channel < numChannels; channel += 1) {
-        channels.push(audioBuffer.getChannelData(channel));
-      }
-      for (let i = 0; i < sampleCount; i += 1) {
-        for (let channel = 0; channel < numChannels; channel += 1) {
-          const sample = Math.max(-1, Math.min(1, channels[channel][i]));
-          view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
-          offset += 2;
+    function drawParticles() {
+      if (!particleCanvas || !particleCtx) return;
+      particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+      particleCtx.fillStyle = 'rgba(255, 10, 10, 0.12)';
+      particleCtx.fillRect(0, 0, particleCanvas.width, particleCanvas.height);
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.y < -20 || p.x < -24 || p.x > particleCanvas.width + 24) {
+          p.x = Math.random() * particleCanvas.width;
+          p.y = particleCanvas.height + 24;
+          p.vx = (Math.random() - 0.5) * 0.8;
+          p.vy = -Math.random() * 0.28 - 0.12;
+          p.alpha = Math.random() * 0.4 + 0.12;
+        }
+        particleCtx.beginPath();
+        particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        particleCtx.fillStyle = `rgba(255, 34, 34, ${p.alpha})`;
+        particleCtx.fill();
+      });
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            particleCtx.strokeStyle = `rgba(255, 30, 30, ${0.12 - dist / 1200})`;
+            particleCtx.lineWidth = 1;
+            particleCtx.beginPath();
+            particleCtx.moveTo(particles[i].x, particles[i].y);
+            particleCtx.lineTo(particles[j].x, particles[j].y);
+            particleCtx.stroke();
+          }
         }
       }
-      return new Blob([view], { type: 'audio/wav' });
     }
 
-    async function extractWavBlobFromFile(file) {
-      const arrayBuffer = await file.arrayBuffer();
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) {
-        throw new Error('AudioContext unsupported');
+    function animateParticles() {
+      if (!particleCanvas || !particleCtx) return;
+      drawParticles();
+      requestAnimationFrame(animateParticles);
+    }
+
+    function initParticles() {
+      if (!particleCanvas || !particleCtx) return;
+      resizeParticleCanvas();
+      particles.length = 0;
+      for (let i = 0; i < particleCount; i += 1) {
+        particles.push(createParticle());
       }
-      const audioContext = new AudioContextClass();
-      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-      await audioContext.close();
-      return encodeWav(audioBuffer);
+      animateParticles();
+      window.addEventListener('resize', resizeParticleCanvas);
+    }
+
+    function initBackground() {
+      setupScrollReveal();
+      initParticles();
     }
 
     backButton.addEventListener('click', showHub);
@@ -849,6 +1321,40 @@
       }
     });
 
+    function getRandomNumber(min, max) {
+      const lower = Math.ceil(Math.min(min, max));
+      const upper = Math.floor(Math.max(min, max));
+      if (Number.isNaN(lower) || Number.isNaN(upper) || lower > upper) return null;
+      return Math.floor(Math.random() * (upper - lower + 1)) + lower;
+    }
+
+    generateRandomBtn.addEventListener('click', () => {
+      const value = getRandomNumber(parseInt(randMin.value, 10), parseInt(randMax.value, 10));
+      randomResult.textContent = value === null ? 'Enter a valid min and max.' : value.toString();
+    });
+
+    clearRandomBtn.addEventListener('click', () => {
+      randMin.value = '1';
+      randMax.value = '100';
+      randomResult.textContent = 'No number yet.';
+    });
+
+    function formatTextCounts(text) {
+      const lines = text.split(/\r?\n/).filter(Boolean).length;
+      const words = text.trim().split(/\s+/).filter(Boolean).length;
+      const chars = text.length;
+      return `Lines: ${lines}\nWords: ${words}\nCharacters: ${chars}`;
+    }
+
+    countTextBtn.addEventListener('click', () => {
+      textResult.textContent = formatTextCounts(textCounterInput.value || '');
+    });
+
+    clearTextBtn.addEventListener('click', () => {
+      textCounterInput.value = '';
+      textResult.textContent = 'No text yet.';
+    });
+
     generateHtmlButton.addEventListener('click', () => {
       const html = htmlSourceInput.value;
       if (!html.trim()) {
@@ -886,215 +1392,109 @@
         currentHtmlObjectUrl = null;
       }
     });
-    // Lightweight on-device knowledge base for richer answers
-    const knowledgeBase = [
-      {
-        key: 'javascript',
-        title: 'JavaScript (Basics)',
-        keywords: ['js', 'javascript', 'function', 'variable', 'console'],
-        summary: 'JavaScript is the language of the web for scripting pages and logic. Use `console.log()` to print, functions to encapsulate logic, and Promises/async for async work.',
-        details: 'JS basics: variables (let/const), functions, objects, arrays. For async code use Promises or async/await. Use strict equality `===`. In browsers, use the DevTools Console to debug.'
-      },
-      {
-        key: 'html',
-        title: 'HTML (Structure)',
-        keywords: ['html', 'markup', 'element', 'doctype', 'head', 'body'],
-        summary: 'HTML defines the structure of web pages using elements like `<div>`, `<p>`, and `<a>`.',
-        details: 'Use semantic tags when possible (`<main>`, `<header>`, `<section>`). Attributes add metadata (e.g., `src`, `href`). Keep content readable and accessible.'
-      },
-      {
-        key: 'css',
-        title: 'CSS (Styling)',
-        keywords: ['css', 'style', 'layout', 'flexbox', 'grid'],
-        summary: 'CSS styles HTML. Use Flexbox and Grid for layouts, and variables for consistent theming.',
-        details: 'Prefer responsive layouts, keep selectors specific but not brittle, and use devtools to inspect computed styles. Minimize repaints by avoiding expensive layout changes in loops.'
-      },
-      {
-        key: 'ffmpeg',
-        title: 'ffmpeg (Command-line)',
-        keywords: ['ffmpeg', 'convert', 'mp3', 'mp4', 'audio', 'codec'],
-        summary: 'ffmpeg is a powerful CLI tool for audio/video conversion and processing (e.g., `ffmpeg -i in.mp4 -vn -acodec libmp3lame -b:a 192k out.mp3`).',
-        details: 'Common flags: `-i` for input, `-vn` to disable video, `-acodec` to choose audio codec, `-b:a` for bitrate. Install using your OS package manager or download from ffmpeg.org.'
-      },
-      {
-        key: 'ffmpeg-wasm',
-        title: 'ffmpeg.wasm (Browser)',
-        keywords: ['ffmpeg wasm', 'ffmpeg.wasm', 'wasm', 'in-browser'],
-        summary: 'ffmpeg.wasm bundles ffmpeg compiled to WebAssembly so conversions can run in the browser without a server, though it is resource-intensive.',
-        details: 'Load via CDN, write files to its virtual FS with `ffmpeg.FS`, then run ffmpeg commands. Large files may fail due to memory or time constraints. Consider server conversion for long files.'
-      },
-      {
-        key: 'mediarecorder',
-        title: 'MediaRecorder & captureStream',
-        keywords: ['mediarecorder', 'capturestream', 'record', 'audio'],
-        summary: 'MediaRecorder captures media streams (e.g., from `video.captureStream()`). Output formats depend on browser support.',
-        details: 'Check `MediaRecorder.isTypeSupported(mimeType)` before using. Not all browsers support `audio/mpeg` (MP3). Use WAV fallback via AudioContext if needed.'
-      },
-      {
-        key: 'web-worker-sandbox',
-        title: 'Web Worker Sandboxing',
-        keywords: ['worker', 'web worker', 'sandbox', 'isolation'],
-        summary: 'Web Workers run JavaScript on a separate thread without direct DOM access, useful for sandboxing and heavy computation.',
-        details: 'Workers can communicate via `postMessage`. They provide basic isolation — avoid exposing sensitive APIs and ensure timeouts for untrusted code.'
-      },
-      {
-        key: 'mp4-mp3',
-        title: 'MP4 → MP3 (Browser tips)',
-        keywords: ['mp4', 'mp3', 'extract audio', 'wav', 'browser'],
-        summary: 'Extracting audio in-browser has multiple paths: MediaRecorder (if supported), AudioContext decode→WAV, or ffmpeg.wasm for full conversion.',
-        details: 'Use MediaRecorder + captureStream for simple cases. If MP3 is unsupported, decode and encode to WAV, which VLC and most players accept. For reliability, convert on a server with ffmpeg.'
-      }
-    ];
 
-    function normalizeWords(s) {
-      return s.toLowerCase().replace(/[\W_]+/g, ' ').split(/\s+/).filter(Boolean);
+    let currentCustomHtmlObjectUrl = null;
+
+    function getCustomizerCards() {
+      return [
+        { label: card1Label.value.trim(), desc: card1Desc.value.trim() },
+        { label: card2Label.value.trim(), desc: card2Desc.value.trim() },
+        { label: card3Label.value.trim(), desc: card3Desc.value.trim() },
+        { label: card4Label.value.trim(), desc: card4Desc.value.trim() }
+      ].filter(card => card.label.length);
     }
 
-    function findBestKnowledgeMatch(query) {
-      const qWords = normalizeWords(query);
-      if (!qWords.length) return null;
-      let best = null;
-      for (const item of knowledgeBase) {
-        const hay = normalizeWords(item.title + ' ' + (item.keywords || []).join(' ') + ' ' + item.summary);
-        const overlap = qWords.filter(w => hay.includes(w)).length;
-        const score = overlap / Math.max(qWords.length, 1);
-        if (!best || score > best.score) best = { item, score };
-      }
-      return best;
+    function buildCustomizerHtml() {
+      const cards = getCustomizerCards();
+      const bgStart = bgStartInput.value || '#0f0f1e';
+      const bgEnd = bgEndInput.value || '#1a1a2e';
+      const textColor = textColorInput.value || '#e0e0e0';
+      const cardBg = cardBgInput.value || '#16213e';
+      const cardText = cardTextInput.value || '#e0e0e0';
+      const title = siteTitleInput.value.trim() || 'Bricy\'s Hub';
+      const subtitle = siteSubtitleInput.value.trim() || 'Choose a tool to launch. More projects will be added here over time.';
+      const accent = brandTextInput.value.trim() || 'Bricy\'s';
+
+      const cardHtml = cards.map(card => `
+            <button class="tool-card">
+              <h2>${escapeHtml(card.label)}</h2>
+              <p>${escapeHtml(card.desc)}</p>
+            </button>`).join('\n');
+
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(title)}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: flex; justify-content: center; background: linear-gradient(135deg, ${bgStart} 0%, ${bgEnd} 100%); color: ${textColor}; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .app { width: 100%; max-width: 1200px; padding: 28px; display: flex; flex-direction: column; gap: 24px; }
+    header { text-align: center; color: white; }
+    header h1 { position: relative; margin: 0; font-size: 2.4rem; font-weight: 700; text-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    header p { margin: 8px 0 0; font-size: 1rem; opacity: 0.95; }
+    .hub-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .tool-card { display: flex; flex-direction: column; align-items: flex-start; padding: 22px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.12); background: ${cardBg}; color: ${cardText}; text-align: left; min-height: 150px; cursor: default; }
+    .tool-card h2 { margin: 0 0 10px; font-size: 1.2rem; }
+    .tool-card p { margin: 0; color: rgba(255,255,255,0.85); line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1><span style="font-weight:700;">${escapeHtml(accent)}</span> ${escapeHtml(title.replace(accent, '').trim())}</h1>
+      <p>${escapeHtml(subtitle)}</p>
+    </header>
+    <div class="hub-grid">${cardHtml}
+    </div>
+  </div>
+</body>
+</html>`;
     }
 
-    function generateAiResponse(input) {
-      const raw = input.trim();
-      const t = raw.toLowerCase();
-      if (!t) return "Say something — I'm small but eager.";
-
-      // If user asks for more details about the last topic
-      if ((t === 'more' || t === 'details' || t === 'tell me more') && lastKnowledgeKey) {
-        const k = knowledgeBase.find(k => k.key === lastKnowledgeKey);
-        return k ? k.details : "No further details available.";
-      }
-
-      // Knowledge base match (quick summary)
-      const match = findBestKnowledgeMatch(raw);
-      if (match && match.score >= 0.25) {
-        lastKnowledgeKey = match.item.key;
-        return `${match.item.title}: ${match.item.summary} (ask 'more' for details)`;
-      }
-
-      if (t.includes('time') || t.includes('what time')) {
-        return 'Local time: ' + new Date().toLocaleString();
-      }
-      if (t.startsWith('joke')) {
-        const jokes = [
-          'Why did the programmer quit his job? Because he didn\'t get arrays.',
-          'I would tell you a UDP joke, but you might not get it.',
-          'There are 10 types of people: those who understand binary and those who don\'t.'
-        ];
-        return jokes[Math.floor(Math.random() * jokes.length)];
-      }
-      if (t.startsWith('reverse ')) {
-        return raw.slice(8).split('').reverse().join('');
-      }
-      if (/^[0-9\s+\-*/().]+$/.test(t)) {
-        try {
-          const val = Function('return (' + t + ')')();
-          return String(val);
-        } catch (e) {
-          return 'Could not evaluate expression.';
-        }
-      }
-      if (t.includes('help') || t.includes('how')) {
-        return "I'm a tiny assistant. Try: 'time', 'joke', a math expression like '2+2', 'reverse hello', ask about 'ffmpeg' or 'javascript', or run JavaScript with `run:` or a ```js``` block.";
-      }
-      if (t.startsWith('explain ')) {
-        const topic = raw.slice(8).trim();
-        if (!topic) return 'Tell me what to explain.';
-        const m = findBestKnowledgeMatch(topic);
-        if (m && m.score >= 0.2) {
-          lastKnowledgeKey = m.item.key;
-          return `${m.item.title}: ${m.item.details}`;
-        }
-        return `I don't have a built-in entry for '${topic}', but I can try to summarize if you provide more context.`;
-      }
-      const canned = [
-        "Sorry, I'm small but eager — try 'help' for examples.",
-        "I can do simple math, tell the time, tell a joke, reverse text, or run small JS snippets.",
-        "Ask about 'ffmpeg', 'mediarecorder', or 'web worker' for quick tips."
-      ];
-      return canned[Math.floor(Math.random() * canned.length)];
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
     }
 
-    // Run untrusted JS in a Web Worker sandbox and capture console.log output.
-    function runCodeInWorker(code, timeout = 8000) {
-      return new Promise((resolve, reject) => {
-        const workerSrc = `
-          self.__logs = [];
-          console = { log: function(){ self.__logs.push(Array.prototype.slice.call(arguments).map(function(a){ try{ return typeof a === 'object' ? JSON.stringify(a) : String(a); }catch(e){ return String(a);} }).join(' ')); } };
-          self.onmessage = function(e) {
-            try {
-              var result = eval(e.data);
-              if (result && typeof result.then === 'function') {
-                result.then(function(r){ self.postMessage({ logs: self.__logs || [], result: r }); }).catch(function(err){ self.postMessage({ logs: self.__logs || [], error: String(err) }); });
-              } else {
-                self.postMessage({ logs: self.__logs || [], result: result });
-              }
-            } catch (err) {
-              self.postMessage({ logs: self.__logs || [], error: String(err) });
-            }
-          };
-        `;
-        const blob = new Blob([workerSrc], { type: 'application/javascript' });
-        const url = URL.createObjectURL(blob);
-        const worker = new Worker(url);
-        let finished = false;
-        const timer = setTimeout(() => {
-          if (!finished) { finished = true; try { worker.terminate(); } catch(e){} URL.revokeObjectURL(url); reject(new Error('Execution timed out')); }
-        }, timeout);
-        worker.onmessage = function(ev) {
-          if (finished) return;
-          finished = true; clearTimeout(timer); URL.revokeObjectURL(url); try { worker.terminate(); } catch(e){}
-          resolve(ev.data);
-        };
-        worker.onerror = function(err) {
-          if (finished) return; finished = true; clearTimeout(timer); URL.revokeObjectURL(url); try { worker.terminate(); } catch(e){};
-          reject(err.message || String(err));
-        };
-        worker.postMessage(code);
-      });
-    }
-
-    function sendAi() {
-      const text = aiInput.value.trim();
-      if (!text) return;
-      addAiMessage('user', text);
-      aiInput.value = '';
-      aiStatus.textContent = 'Thinking...';
-
-      // Detect code: ```js ... ``` or prefixes like run: or js:
-      const codeBlockMatch = text.match(/```(?:js)?\n([\s\S]*?)```/i);
-      const runPrefixMatch = text.match(/^(?:run:|js:)\s*([\s\S]*)/i);
-      const codeToRun = codeBlockMatch ? codeBlockMatch[1] : (runPrefixMatch ? runPrefixMatch[1] : null);
-      if (codeToRun) {
-        aiStatus.textContent = 'Running code in sandbox...';
-        runCodeInWorker(codeToRun, 10000).then(res => {
-          const logs = (res && res.logs && res.logs.length) ? ('Console:\n' + res.logs.join('\n') + '\n') : '';
-          const out = res && res.error ? ('Error: ' + res.error) : ('Result: ' + String(res && res.result));
-          addAiMessage('ai', logs + out);
-          aiStatus.textContent = 'Ready';
-        }).catch(err => {
-          addAiMessage('ai', 'Execution failed: ' + String(err));
-          aiStatus.textContent = 'Ready';
-        });
-        return;
+    function createCustomHtmlDownload() {
+      const html = buildCustomizerHtml();
+      if (currentCustomHtmlObjectUrl) {
+        URL.revokeObjectURL(currentCustomHtmlObjectUrl);
       }
-
-      setTimeout(() => {
-        const reply = generateAiResponse(text);
-        addAiMessage('ai', reply);
-        aiStatus.textContent = 'Ready';
-      }, 300 + Math.random() * 600);
+      currentCustomHtmlObjectUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+      customHtmlDownloadLink.href = currentCustomHtmlObjectUrl;
+      customHtmlDownloadLink.download = `${siteTitleInput.value.trim().replace(/\s+/g, '-').toLowerCase() || 'custom-site'}.html`;
+      customHtmlDownloadLink.textContent = `Download ${customHtmlDownloadLink.download}`;
+      customHtmlDownloadLink.style.display = 'inline-block';
+      customizerStatus.textContent = 'Customized HTML is ready. Click the link to download.';
     }
 
+    generateCustomHtmlBtn.addEventListener('click', createCustomHtmlDownload);
+    resetCustomizerBtn.addEventListener('click', () => {
+      siteTitleInput.value = "Bricy's Hub";
+      siteSubtitleInput.value = 'Choose a tool to launch. More projects will be added here over time.';
+      brandTextInput.value = "Bricy's";
+      bgStartInput.value = '#0f0f1e';
+      bgEndInput.value = '#1a1a2e';
+      textColorInput.value = '#e0e0e0';
+      cardBgInput.value = '#16213e';
+      cardTextInput.value = '#e0e0e0';
+      card1Label.value = 'Cipher Studio';
+      card1Desc.value = 'Encrypt, decrypt, and analyze text with multiple cipher algorithms.';
+      card2Label.value = 'QR Code Generator';
+      card2Desc.value = 'Generate a QR code instantly from any link.';
+      card3Label.value = 'HTML File Builder';
+      card3Desc.value = 'Create an .html file from raw HTML source and download it instantly.';
+      card4Label.value = 'JSON Formatter';
+      card4Desc.value = 'Validate and pretty-print JSON, and minify for compact output.';
+      customHtmlDownloadLink.style.display = 'none';
+      customizerStatus.textContent = 'Customize the page and click "Create Customized HTML".';
+      if (currentCustomHtmlObjectUrl) {
+        URL.revokeObjectURL(currentCustomHtmlObjectUrl);
+        currentCustomHtmlObjectUrl = null;
+      }
+    });
     document.addEventListener('keydown', event => {
       if ((event.key === 'ArrowLeft' || event.key === 'Escape') && !toolScreen.classList.contains('hidden')) {
         showHub();
@@ -1197,7 +1597,13 @@
 
     function base64Encode(text) {
       try {
-        return btoa(unescape(encodeURIComponent(text)));
+        const encoder = new TextEncoder();
+        const bytes = encoder.encode(text);
+        let binary = '';
+        for (const byte of bytes) {
+          binary += String.fromCharCode(byte);
+        }
+        return btoa(binary);
       } catch (e) {
         return 'Error encoding';
       }
@@ -1205,7 +1611,12 @@
 
     function base64Decode(text) {
       try {
-        return decodeURIComponent(escape(atob(text)));
+        const binary = atob(text);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i += 1) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        return new TextDecoder().decode(bytes);
       } catch (e) {
         return 'Error decoding';
       }
@@ -1301,6 +1712,9 @@
 
     updateKeyVisibility();
 
+    updateDashboardMetrics();
+    initDashboard();
+
     // JSON formatter
     if (formatJsonBtn) formatJsonBtn.addEventListener('click', () => {
       const s = (jsonInput.value || '').trim();
@@ -1331,9 +1745,26 @@
         const a = document.createElement('a'); a.href = url; a.download = file.name.replace(/(\.[^.]+)$/, '') + `-${canvas.width}x${canvas.height}.png`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
       }, 'image/png');
     });
-    if (clearImageBtn) clearImageBtn.addEventListener('click', () => { imageInput.value = ''; imagePreview.src = ''; imagePreview.style.display = 'none'; imageWidth.value = ''; imageHeight.value = ''; });
+    if (clearImageBtn) clearImageBtn.addEventListener('click', () => {
+      imageInput.value = '';
+      imagePreview.src = '';
+      imagePreview.style.display = 'none';
+      imageWidth.value = '';
+      imageHeight.value = '';
+      if (currentImagePreviewUrl) {
+        URL.revokeObjectURL(currentImagePreviewUrl);
+        currentImagePreviewUrl = null;
+      }
+    });
     if (imageInput) imageInput.addEventListener('change', () => {
-      const f = imageInput.files && imageInput.files[0]; if (!f) return; const url = URL.createObjectURL(f); imagePreview.src = url; imagePreview.style.display = 'block';
+      const f = imageInput.files && imageInput.files[0];
+      if (!f) return;
+      if (currentImagePreviewUrl) {
+        URL.revokeObjectURL(currentImagePreviewUrl);
+      }
+      currentImagePreviewUrl = URL.createObjectURL(f);
+      imagePreview.src = currentImagePreviewUrl;
+      imagePreview.style.display = 'block';
     });
 
     // Password generator
@@ -1373,23 +1804,12 @@
       colorPalette.innerHTML = '';
       if (!cols.size) colorPalette.textContent = 'No colors found';
       cols.forEach(hex => {
-        const d = document.createElement('div');
-        d.style.width = '40px';
-        d.style.height = '40px';
-        d.style.borderRadius = '6px';
-        d.style.background = hex;
-        d.title = hex;
-        d.style.cursor = 'pointer';
-        d.addEventListener('click', () => {
-          navigator.clipboard.writeText(hex);
-          selectedColorHex.textContent = `HEX: ${hex}`;
-          d.textContent = '✓';
-          setTimeout(() => { d.textContent = ''; }, 800);
-        });
-        colorPalette.appendChild(d);
+        const d = document.createElement('div'); d.style.width = '40px'; d.style.height = '40px'; d.style.borderRadius = '6px'; d.style.background = hex; d.title = hex; d.style.cursor = 'pointer'; d.addEventListener('click', () => { navigator.clipboard.writeText(hex); d.textContent = '✓'; setTimeout(() => { d.textContent = ''; }, 800); }); colorPalette.appendChild(d);
       });
     });
-    if (clearColorsBtn) clearColorsBtn.addEventListener('click', () => { colorImageInput.value = ''; colorPalette.innerHTML = 'No colors yet.'; selectedColorHex.textContent = 'Click a swatch to copy the exact hex code.'; });
+    if (clearColorsBtn) clearColorsBtn.addEventListener('click', () => { colorImageInput.value = ''; colorPalette.innerHTML = 'No colors yet.'; });
+
+    initBackground();
   </script>
 </body>
 </html>
