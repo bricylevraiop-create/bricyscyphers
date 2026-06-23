@@ -4,385 +4,681 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bricy's Hub</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="audio-data.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #050102;
-      --bg-gradient: linear-gradient(180deg, #080408 0%, #040204 100%);
-      --surface: rgba(18, 0, 0, 0.92);
-      --surface-soft: rgba(24, 0, 0, 0.76);
-      --surface-strong: rgba(32, 0, 0, 0.98);
-      --text: #f5ede7;
-      --muted: rgba(245, 235, 230, 0.70);
-      --accent: #a21e3c;
-      --accent-strong: #70182d;
-      --accent-soft: rgba(162, 30, 60, 0.18);
-      --border: rgba(255, 255, 255, 0.08);
-      --shadow: 0 32px 110px rgba(0, 0, 0, 0.42);
-      --radius: 34px;
-      --radius-sm: 18px;
-      --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    }
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-    html {
-      scroll-behavior: smooth;
-      min-height: 100%;
-      background: #050102;
-    }
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; min-height: 100%; background: #050102; }
     body {
-      margin: 0;
       min-height: 100vh;
-      font-family: var(--font);
-      color: var(--text);
-      background: radial-gradient(circle at 15% 15%, rgba(255, 0, 0, 0.12), transparent 16%), var(--bg-gradient);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: #f5ede7;
+      background: radial-gradient(circle at 15% 15%, rgba(255,0,0,0.10), transparent 20%),
+                  linear-gradient(180deg, #080408 0%, #040204 100%);
       overflow-x: hidden;
       position: relative;
     }
+
+    /* ─── Variables ─── */
+    :root {
+      --accent: #a21e3c;
+      --accent-strong: #70182d;
+      --accent-glow: rgba(162, 30, 60, 0.25);
+      --surface: rgba(18, 0, 0, 0.92);
+      --surface-soft: rgba(24, 0, 0, 0.76);
+      --border: rgba(255, 255, 255, 0.06);
+      --radius: 34px;
+      --radius-sm: 18px;
+      --shadow: 0 32px 110px rgba(0, 0, 0, 0.42);
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─── Canvas ─── */
     #particleCanvas {
       position: fixed;
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      opacity: 0.9;
+      opacity: 0.8;
     }
+
+    /* ─── App Layout ─── */
     .app {
       position: relative;
       z-index: 3;
       width: min(1240px, 100%);
       margin: 0 auto;
-      padding: 32px 32px 60px;
+      padding: 28px 24px 60px;
       display: flex;
       flex-direction: column;
       gap: 28px;
     }
+
+    /* ─── Header ─── */
     header {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 8px;
       position: relative;
       z-index: 4;
     }
     header h1 {
       margin: 0;
-      font-size: clamp(2.8rem, 4.8vw, 4.8rem);
+      font-size: clamp(2.6rem, 5vw, 4.6rem);
       font-weight: 900;
-      letter-spacing: 0.16em;
+      letter-spacing: 0.12em;
       line-height: 1.02;
       text-transform: uppercase;
-      text-shadow: 0 20px 80px rgba(255, 0, 18, 0.16);
-      position: relative;
+      text-shadow: 0 20px 80px rgba(255, 0, 18, 0.15);
     }
     header h1 .backdrop-text {
       position: absolute;
-      top: -46px;
+      top: -38px;
       left: 0;
-      font-size: 0.92rem;
-      font-weight: 900;
-      color: rgba(255, 255, 255, 0.18);
-      letter-spacing: 0.28em;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.12);
+      letter-spacing: 0.3em;
       text-transform: uppercase;
       pointer-events: none;
     }
     header p {
       margin: 0;
-      max-width: 760px;
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.75;
+      max-width: 700px;
+      color: rgba(245, 235, 230, 0.65);
+      font-size: 0.95rem;
+      line-height: 1.7;
     }
-    .topbar-panel {
-      display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
-      gap: 22px;
-      z-index: 4;
-    }
-    .topbar-card {
+
+    /* ─── Cards ─── */
+    .card {
       position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      padding: 28px;
-      border-radius: 34px;
+      border-radius: var(--radius);
       border: 1px solid var(--border);
-      background: rgba(15, 0, 0, 0.86);
+      background: var(--surface);
       box-shadow: var(--shadow);
       backdrop-filter: blur(24px);
+      padding: 28px;
       overflow: hidden;
     }
-    .topbar-card::before {
+    .card::before {
       content: '';
       position: absolute;
       inset: -12px;
-      background: radial-gradient(circle at top right, rgba(255, 24, 24, 0.16), transparent 22%);
+      background: radial-gradient(circle at top right, rgba(255, 24, 24, 0.08), transparent 22%);
       pointer-events: none;
     }
-    .panel-chip {
+
+    .card-chip {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      padding: 10px 16px;
+      padding: 6px 14px;
       border-radius: 999px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.18em;
       color: #fff;
       background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      z-index: 2;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 12px;
     }
-    .topbar-card h2 {
-      margin: 0;
+
+    /* ─── Topbar ─── */
+    .topbar-panel {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 22px;
+      z-index: 4;
+    }
+    .topbar-card .card-chip + h2 {
+      margin: 0 0 6px;
       font-size: 1.05rem;
       font-weight: 700;
-      letter-spacing: 0.22em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: #ff9898;
     }
     .topbar-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.96rem;
-      line-height: 1.75;
+      margin: 0 0 16px;
+      color: rgba(245, 235, 230, 0.7);
+      font-size: 0.92rem;
+      line-height: 1.7;
     }
+
     .music-row {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       justify-content: space-between;
     }
     .music-controls {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
     .music-controls button {
-      min-width: 48px;
-      min-height: 48px;
+      min-width: 44px;
+      min-height: 44px;
       border: none;
-      border-radius: 16px;
-      background: rgba(20, 10, 15, 0.72);
+      border-radius: 14px;
+      background: rgba(20, 10, 15, 0.7);
       color: #fff;
       cursor: pointer;
-      transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
-      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: var(--transition);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
     }
     .music-controls button:hover {
       transform: translateY(-2px);
-      background: rgba(162, 30, 60, 0.28);
-      box-shadow: 0 24px 44px rgba(162, 30, 60, 0.20);
+      background: rgba(162, 30, 60, 0.25);
+      box-shadow: 0 16px 40px rgba(162, 30, 60, 0.15);
+    }
+    .music-controls button.active {
+      background: var(--accent);
+      box-shadow: 0 16px 40px rgba(162, 30, 60, 0.3);
     }
     .music-slider {
-      width: 160px;
+      width: 140px;
       accent-color: var(--accent);
+      cursor: pointer;
     }
     .volume-label {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 0.92rem;
+      gap: 8px;
+      color: rgba(245, 235, 230, 0.6);
+      font-size: 0.85rem;
     }
     .music-status {
-      color: var(--muted);
-      font-size: 0.92rem;
-      letter-spacing: 0.02em;
+      color: rgba(245, 235, 230, 0.55);
+      font-size: 0.85rem;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    .hub-screen {
+    .music-status .track-name {
+      color: #ff9898;
+      font-weight: 600;
+    }
+    .music-status .status-text {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin-top: 10px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .progress-bar .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    /* ─── Metrics ─── */
+    .metric-grid {
       display: grid;
-      gap: 28px;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
     }
-    .hub-search-card {
-      padding: 28px;
-      border-radius: 34px;
+    .metric-card {
+      padding: 18px 20px;
+      border-radius: 24px;
       border: 1px solid var(--border);
-      background: rgba(18, 0, 0, 0.88);
+      background: rgba(15, 0, 0, 0.7);
+    }
+    .metric-card h3 {
+      margin: 0 0 6px;
+      font-size: 0.7rem;
+      color: #ff9b9b;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+    }
+    .metric-card p {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .activity-log {
+      display: grid;
+      gap: 8px;
+      max-height: 160px;
+      overflow-y: auto;
+      background: rgba(8, 0, 0, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px 16px;
+    }
+    .activity-item {
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.02);
+      color: rgba(245, 235, 230, 0.8);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      border-left: 2px solid var(--accent);
+    }
+
+    /* ─── Search ─── */
+    .hub-search-card {
+      padding: 24px 28px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
       box-shadow: var(--shadow);
       backdrop-filter: blur(24px);
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
     }
     .search-box {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
     }
     .search-box input {
       flex: 1;
-      min-width: 220px;
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(10, 0, 0, 0.76);
-      color: var(--text);
-      padding: 16px 18px;
-      font-size: 1rem;
+      min-width: 200px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(10, 0, 0, 0.7);
+      color: #f5ede7;
+      padding: 14px 18px;
+      font-size: 0.95rem;
       outline: none;
+      transition: var(--transition);
     }
-    .search-box input::placeholder { color: rgba(245, 235, 230, 0.42); }
+    .search-box input::placeholder { color: rgba(245, 235, 230, 0.35); }
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
     .search-results {
       display: grid;
-      gap: 12px;
+      gap: 10px;
+      margin-top: 16px;
     }
     .search-result {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 18px 20px;
-      border-radius: 24px;
-      background: rgba(8, 0, 0, 0.82);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text);
+      padding: 14px 18px;
+      border-radius: 20px;
+      background: rgba(8, 0, 0, 0.7);
+      border: 1px solid var(--border);
     }
-    .search-result h3 { margin: 0; font-size: 1rem; }
-    .search-result p { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.45; }
-    .search-result button { border: none; border-radius: 14px; background: rgba(255, 0, 0, 0.20); color: #fff; padding: 10px 14px; cursor: pointer; }
+    .search-result h3 { margin: 0; font-size: 0.95rem; font-weight: 600; }
+    .search-result p { margin: 0; color: rgba(245, 235, 230, 0.55); font-size: 0.85rem; }
+    .search-result button {
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 0, 0, 0.15);
+      color: #fff;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+      transition: var(--transition);
+    }
+    .search-result button:hover { background: var(--accent); }
+
+    /* ─── Tool Grid ─── */
     .hub-grid {
       display: grid;
-      gap: 24px;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
     .tool-card {
       position: relative;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 190px;
-      padding: 32px;
-      border-radius: 34px;
-      border: 1px solid rgba(255, 255, 255, 0.10);
-      background: linear-gradient(180deg, rgba(22, 0, 0, 0.96), rgba(10, 0, 0, 0.74));
-      color: var(--text);
+      min-height: 170px;
+      padding: 28px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(22, 0, 0, 0.95), rgba(10, 0, 0, 0.7));
+      color: #f5ede7;
       cursor: pointer;
-      transition: transform 0.32s ease, border-color 0.32s ease, box-shadow 0.32s ease, background 0.32s ease;
-      box-shadow: 0 30px 110px rgba(0, 0, 0, 0.26);
-      backdrop-filter: blur(24px);
+      transition: var(--transition);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(16px);
       overflow: hidden;
+      text-align: left;
+      font-family: inherit;
     }
     .tool-card::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 18% 22%, rgba(255, 20, 20, 0.12), transparent 18%), radial-gradient(circle at 82% 86%, rgba(255, 30, 30, 0.1), transparent 24%);
+      background: radial-gradient(circle at 20% 20%, rgba(255, 20, 20, 0.08), transparent 20%),
+                  radial-gradient(circle at 80% 80%, rgba(255, 30, 30, 0.06), transparent 24%);
       pointer-events: none;
     }
     .tool-card:hover {
-      transform: translateY(-8px);
-      border-color: rgba(255, 40, 40, 0.38);
-      box-shadow: 0 40px 120px rgba(255, 6, 6, 0.18);
-      background: linear-gradient(180deg, rgba(40, 0, 0, 0.98), rgba(18, 0, 0, 0.82));
+      transform: translateY(-6px);
+      border-color: rgba(255, 40, 40, 0.3);
+      box-shadow: 0 32px 100px rgba(255, 6, 6, 0.12);
+      background: linear-gradient(180deg, rgba(40, 0, 0, 0.95), rgba(18, 0, 0, 0.8));
     }
-    .tool-card h2 { margin: 0 0 14px; font-size: 1.45rem; color: #fff; }
-    .tool-card p { margin: 0; color: rgba(245, 230, 230, 0.84); line-height: 1.72; font-size: 0.96rem; }
-    .tool-screen { display: block; }
-    .tool-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; flex-wrap: wrap; padding-bottom: 10px; }
-    .tool-header h1 { margin: 0; font-size: clamp(2rem, 4vw, 3.6rem); line-height: 1.03; letter-spacing: 0.08em; }
-    .tool-header p { margin: 12px 0 0; color: var(--muted); max-width: 760px; }
+    .tool-card h2 {
+      margin: 0 0 10px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .tool-card p {
+      margin: 0;
+      color: rgba(245, 230, 230, 0.75);
+      line-height: 1.6;
+      font-size: 0.9rem;
+    }
+    .tool-card .card-emoji {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+
+    /* ─── Tool Screen ─── */
+    .tool-screen { display: none; }
+    .tool-screen.active { display: block; }
+    .tool-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      padding-bottom: 12px;
+    }
+    .tool-header h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 3.5vw, 3.2rem);
+      line-height: 1.05;
+      letter-spacing: 0.06em;
+    }
+    .tool-header p {
+      margin: 8px 0 0;
+      color: rgba(245, 235, 230, 0.6);
+      max-width: 700px;
+    }
     .hidden { display: none !important; }
+
+    /* ─── Main Panel ─── */
     .main {
-      position: relative;
       display: grid;
       grid-template-columns: 1.05fr 0.95fr;
       gap: 0;
-      background: rgba(14, 0, 0, 0.92);
-      border-radius: 34px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(14, 0, 0, 0.9);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
       box-shadow: var(--shadow);
       overflow: hidden;
       backdrop-filter: blur(24px);
-      min-height: 520px;
+      min-height: 480px;
+      position: relative;
     }
-    .main::before { content: '';
+    .main::before {
+      content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(255, 24, 24, 0.08), transparent 16%);
+      background: linear-gradient(135deg, rgba(255, 24, 24, 0.06), transparent 16%);
       pointer-events: none;
     }
-    .left-panel, .right-panel { position: relative; padding: 38px; }
-    .left-panel { border-right: 1px solid rgba(255, 255, 255, 0.06); background: rgba(24, 0, 0, 0.80); }
-    .right-panel { background: rgba(10, 0, 0, 0.62); display: flex; flex-direction: column; gap: 24px; }
-    .section-title { margin: 0 0 24px; color: rgba(255, 255, 255, 0.76); font-size: 0.84rem; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; }
-    .field { display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px; }
-    label { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+    .left-panel, .right-panel {
+      position: relative;
+      padding: 32px 34px;
+    }
+    .left-panel {
+      border-right: 1px solid var(--border);
+      background: rgba(24, 0, 0, 0.7);
+    }
+    .right-panel {
+      background: rgba(10, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .section-title {
+      margin: 0 0 18px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    /* ─── Form Elements ─── */
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: rgba(245, 235, 230, 0.85);
+    }
     textarea, input, select {
       width: 100%;
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(10, 0, 0, 0.78);
-      color: var(--text);
-      font-size: 0.95rem;
-      padding: 16px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(10, 0, 0, 0.7);
+      color: #f5ede7;
+      font-size: 0.92rem;
+      padding: 14px 16px;
       font-family: inherit;
-      transition: border-color 0.28s ease, transform 0.28s ease, box-shadow 0.28s ease;
+      transition: var(--transition);
     }
-    textarea:focus, input:focus, select:focus { border-color: rgba(255, 90, 90, 0.48); box-shadow: 0 0 0 4px rgba(255, 80, 80, 0.12); transform: translateY(-1px); outline: none; }
-    textarea { resize: vertical; min-height: 130px; font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace; }
-    .algo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
-    .algo-btn { padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(15, 0, 0, 0.72); color: var(--text); font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.28s ease; }
-    .algo-btn:hover { border-color: rgba(162, 30, 60, 0.4); background: rgba(162, 30, 60, 0.08); transform: translateY(-1px); }
-    .algo-btn.active { background: rgba(162, 30, 60, 0.22); border-color: #8d1a34; color: #fff; box-shadow: 0 12px 34px rgba(162, 30, 60, 0.14); }
-    .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
-    button.primary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: none; border-radius: 20px; background: linear-gradient(135deg, var(--accent), var(--accent-strong)); color: #fff; padding: 16px 22px; font-size: 0.95rem; font-weight: 800; cursor: pointer; box-shadow: 0 20px 70px rgba(162, 30, 60, 0.22); }
-    button.primary:hover { transform: translateY(-2px); box-shadow: 0 24px 92px rgba(162, 30, 60, 0.28); }
-    button.secondary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 20px; background: rgba(18, 0, 0, 0.72); color: var(--text); padding: 16px 22px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
-    button.secondary:hover { transform: translateY(-1px); border-color: rgba(162, 30, 60, 0.36); background: rgba(162, 30, 60, 0.12); }
-    .output-card { background: rgba(10, 0, 0, 0.76); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 26px; padding: 28px; display: flex; flex-direction: column; gap: 16px; flex: 1; box-shadow: 0 28px 80px rgba(0, 0, 0, 0.22); backdrop-filter: blur(16px); }
-    .output-label { color: rgba(255, 255, 255, 0.78); font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-    .output-text { background: rgba(8, 0, 0, 0.86); border-radius: 20px; padding: 20px; min-height: 92px; border: 1px solid rgba(255, 255, 255, 0.08); font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 0.95rem; color: var(--text); white-space: pre-wrap; word-break: break-word; overflow-y: auto; max-height: 280px; }
-    .brute-list { max-height: 300px; overflow-y: auto; background: rgba(8, 0, 0, 0.74); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 14px; }
-    .brute-item { padding: 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); font-size: 0.92rem; font-family: ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace; color: var(--text); }
+    textarea:focus, input:focus, select:focus {
+      border-color: rgba(255, 90, 90, 0.4);
+      box-shadow: 0 0 0 3px rgba(255, 80, 80, 0.08);
+      outline: none;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+      font-family: 'Inter', monospace;
+    }
+    select { appearance: auto; }
+
+    .note {
+      color: rgba(245, 235, 230, 0.5);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      margin-top: 2px;
+    }
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 14px 22px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #fff;
+      box-shadow: 0 16px 48px rgba(162, 30, 60, 0.2);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 64px rgba(162, 30, 60, 0.25);
+    }
+    .btn-secondary {
+      border: 1px solid var(--border);
+      background: rgba(18, 0, 0, 0.6);
+      color: #f5ede7;
+    }
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+      border-color: rgba(162, 30, 60, 0.3);
+      background: rgba(162, 30, 60, 0.08);
+    }
+    .btn-small {
+      padding: 10px 16px;
+      font-size: 0.8rem;
+      border-radius: 12px;
+    }
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .algo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .algo-btn {
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(15, 0, 0, 0.6);
+      color: #f5ede7;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    .algo-btn:hover {
+      border-color: rgba(162, 30, 60, 0.3);
+      background: rgba(162, 30, 60, 0.06);
+    }
+    .algo-btn.active {
+      background: rgba(162, 30, 60, 0.2);
+      border-color: #8d1a34;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(162, 30, 60, 0.12);
+    }
+
+    /* ─── Output ─── */
+    .output-card {
+      background: rgba(10, 0, 0, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+    .output-label {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .output-text {
+      background: rgba(8, 0, 0, 0.8);
+      border-radius: var(--radius-sm);
+      padding: 16px 18px;
+      min-height: 80px;
+      border: 1px solid var(--border);
+      font-family: 'Inter', monospace;
+      font-size: 0.9rem;
+      color: #f5ede7;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-y: auto;
+      max-height: 240px;
+    }
+    .copy-btn {
+      align-self: flex-end;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .copy-btn:hover { background: rgba(255, 255, 255, 0.15); }
+
+    .brute-list {
+      max-height: 260px;
+      overflow-y: auto;
+      background: rgba(8, 0, 0, 0.7);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+    .brute-item {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      font-family: 'Inter', monospace;
+      color: rgba(245, 235, 230, 0.8);
+    }
     .brute-item:last-child { border-bottom: none; }
-    .note { color: var(--muted); font-size: 0.89rem; line-height: 1.6; margin-top: -4px; }
-    .copy-button { align-self: flex-end; background: rgba(255, 255, 255, 0.92); color: #000; border: none; border-radius: 14px; padding: 12px 16px; font-size: 0.88rem; font-weight: 700; cursor: pointer; }
-    .copy-button:hover { transform: translateY(-1px); background: #fff; }
-    .modal { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(16px); z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-    .modal.visible { opacity: 1; pointer-events: auto; }
-    .modal-card { width: 100%; max-width: 600px; border-radius: 34px; background: rgba(12, 0, 0, 0.96); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 42px 150px rgba(0, 0, 0, 0.55); padding: 36px; position: relative; overflow: hidden; }
-    .modal-card::before { content: ''; position: absolute; inset: -18px; background: radial-gradient(circle at top left, rgba(255, 0, 0, 0.16), transparent 18%); filter: blur(34px); pointer-events: none; }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
-    .modal-header h2 { margin: 0; color: #fff; font-size: 1.6rem; }
-    .modal-actions { display: grid; gap: 14px; margin-top: 24px; }
-    .modal-button { width: 100%; border: none; border-radius: 18px; padding: 18px 22px; font-size: 1rem; font-weight: 700; cursor: pointer; color: #fff; background: rgba(255, 20, 20, 0.18); box-shadow: 0 18px 40px rgba(255, 0, 0, 0.12); }
-    .modal-button:hover { transform: translateY(-2px); box-shadow: 0 24px 44px rgba(255, 0, 0, 0.18); }
-    .modal-actions .secondary { background: rgba(255, 255, 255, 0.08); color: #fff; }
-    .animate-reveal { opacity: 0; transform: translateY(34px) scale(0.985); transition: opacity 0.85s ease, transform 0.85s ease; will-change: opacity, transform; }
-    .reveal-visible { opacity: 1; transform: translateY(0) scale(1); }
-    .float { animation: floatMotion 8s ease-in-out infinite; }
-    @keyframes floatMotion { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-    .metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-    .metric-card { padding: 24px; border-radius: 28px; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(15, 0, 0, 0.82); box-shadow: 0 18px 46px rgba(0, 0, 0, 0.22); }
-    .metric-card h3 { margin: 0 0 10px; font-size: 0.88rem; color: #ff9b9b; text-transform: uppercase; letter-spacing: 0.16em; }
-    .metric-card p { margin: 0; font-size: 2.2rem; color: #fff; font-weight: 800; }
-    .activity-log { display: grid; gap: 12px; max-height: 260px; overflow-y: auto; background: rgba(8, 0, 0, 0.82); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 22px; padding: 18px; }
-    .activity-item { padding: 14px 16px; border-radius: 18px; background: rgba(255, 255, 255, 0.03); color: var(--text); font-size: 0.92rem; line-height: 1.5; }
-    @media (max-width: 1080px) { .topbar-panel, .main, .metric-grid { grid-template-columns: 1fr; } .hub-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); } }
-    @media (max-width: 760px) {
-      .app { padding: 24px 18px 46px; }
-      header h1 { font-size: 3rem; }
-      .music-row { flex-direction: column; align-items: stretch; }
-      .music-controls { width: 100%; justify-content: flex-start; }
-      .music-slider { width: 100%; }
-      .algo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .action-buttons { grid-template-columns: 1fr; }
-      .left-panel, .right-panel { padding: 28px; }
+
+    /* ─── QR / Image Preview ─── */
+    #qrImage, #imagePreview {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      display: block;
     }
-    @media (max-width: 520px) {
-      .app { padding: 18px 14px 40px; }
-      header h1 { font-size: 2.4rem; }
-      .tool-card { min-height: 170px; padding: 24px; }
-      .topbar-card { padding: 22px; }
-      .music-controls button { width: 100%; }
-      .search-box { flex-direction: column; }
+    #qrOutputWrapper, #imagePreviewWrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 240px;
     }
-    /* Audio unlock overlay (shown when playback is blocked) */
+    #colorPalette {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      min-height: 80px;
+      align-items: center;
+      padding: 8px 0;
+    }
+    .color-swatch {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.08);
+      transition: var(--transition);
+    }
+    .color-swatch:hover {
+      transform: scale(1.08);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    /* ─── Audio Unlock Overlay ─── */
     #audioUnlockOverlay {
       position: fixed;
       inset: 0;
@@ -390,491 +686,554 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.72));
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
       padding: 24px;
     }
     #audioUnlockOverlay .panel {
-      background: linear-gradient(180deg, rgba(24,0,0,0.92), rgba(16,0,0,0.96));
-      border-radius: 18px;
-      padding: 28px;
+      background: linear-gradient(180deg, rgba(24,0,0,0.95), rgba(16,0,0,0.98));
+      border-radius: var(--radius);
+      padding: 40px 48px;
       text-align: center;
-      border: 1px solid rgba(255,255,255,0.06);
-      box-shadow: 0 36px 96px rgba(0,0,0,0.6);
-      max-width: 520px;
-      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: 0 40px 120px rgba(0,0,0,0.8);
+      max-width: 480px;
+      color: #f5ede7;
     }
-    #audioUnlockOverlay h3 { margin: 0 0 12px; color: #ffb3b3; }
-    #audioUnlockOverlay p { margin: 0 0 18px; color: var(--muted); }
+    #audioUnlockOverlay h3 { 
+      margin: 0 0 12px; 
+      color: #ffb3b3; 
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+    #audioUnlockOverlay p { 
+      margin: 0 0 24px; 
+      color: rgba(245, 235, 230, 0.6); 
+      line-height: 1.7;
+      font-size: 1rem;
+    }
     #audioUnlockOverlay button {
-      background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
       color: #fff;
       border: none;
-      padding: 12px 20px;
-      border-radius: 12px;
+      padding: 16px 40px;
+      border-radius: var(--radius-sm);
       font-weight: 700;
+      font-size: 1.1rem;
       cursor: pointer;
-      box-shadow: 0 18px 42px rgba(112,24,45,0.32);
+      transition: var(--transition);
+      box-shadow: 0 16px 40px rgba(112,24,45,0.4);
     }
-    #audioUnlockOverlay button:hover { transform: translateY(-2px); }
+    #audioUnlockOverlay button:hover { 
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 24px 60px rgba(112,24,45,0.5);
+    }
+    #audioUnlockOverlay button:active {
+      transform: scale(0.98);
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 1024px) {
+      .topbar-panel { grid-template-columns: 1fr; }
+      .main { grid-template-columns: 1fr; }
+      .metric-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .app { padding: 20px 16px 40px; }
+      header h1 { font-size: 2.6rem; }
+      .music-row { flex-direction: column; align-items: stretch; }
+      .music-controls { width: 100%; justify-content: flex-start; }
+      .music-slider { width: 100%; }
+      .algo-grid { grid-template-columns: repeat(2, 1fr); }
+      .action-buttons { grid-template-columns: 1fr; }
+      .left-panel, .right-panel { padding: 24px; }
+      .hub-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+      .metric-grid { grid-template-columns: 1fr 1fr; }
+      #audioUnlockOverlay .panel { padding: 30px 24px; }
+    }
+    @media (max-width: 480px) {
+      .app { padding: 14px 12px 32px; }
+      header h1 { font-size: 2rem; }
+      .tool-card { min-height: 140px; padding: 20px; }
+      .topbar-card { padding: 20px; }
+      .search-box { flex-direction: column; align-items: stretch; }
+      .search-box input { min-width: unset; }
+      #audioUnlockOverlay .panel { padding: 24px 20px; }
+      #audioUnlockOverlay h3 { font-size: 1.2rem; }
+    }
+
+    /* ─── Utility ─── */
+    .animate-reveal {
+      opacity: 0;
+      transform: translateY(28px) scale(0.98);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+      will-change: opacity, transform;
+    }
+    .reveal-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .flex-center { display: flex; justify-content: center; align-items: center; }
+    .gap-8 { gap: 8px; }
+    .mt-8 { margin-top: 8px; }
+    .w-full { width: 100%; }
+    .text-muted { color: rgba(245, 235, 230, 0.5); }
   </style>
 </head>
 <body>
   <canvas id="particleCanvas"></canvas>
-  <audio id="bgAudio" loop preload="auto"></audio>
+  
+  <!-- ─── AUDIO ELEMENT ─── -->
+  <audio id="bgAudio" preload="auto">
+    <!-- Your Hotline Miami 2 Main Menu soundtrack -->
+    <source src="https://weary-aqua-r1l9i7yd.edgeone.dev/Hotline%20Miami%202%20OST%20-%20Main%20Menu.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Audio Unlock Overlay -->
   <div id="audioUnlockOverlay" aria-hidden="true">
     <div class="panel" role="dialog" aria-label="Enable audio dialog">
-      <h3>Enable Ambient Audio</h3>
-      <p>Playback was blocked by your browser. Click the button below (or anywhere) to enable ambient sound.</p>
-      <button id="enableAudioBtn" type="button">Enable Audio</button>
+      <h3>🎵 Enable Hotline Miami Soundtrack</h3>
+      <p>Your browser is blocking autoplay. Click the button below to enable the atmospheric Hotline Miami 2 Main Menu soundtrack.</p>
+      <button id="enableAudioBtn" type="button">🎧 Enable Audio</button>
     </div>
   </div>
+
   <div class="app">
+    <!-- ─── Header ─── -->
     <header>
-      <h1>Bricy's Hub</h1>
+      <h1>
+        <span class="backdrop-text">Bricy's</span>
+        Bricy's Hub
+      </h1>
       <p id="hubWelcome">Choose a tool to launch. More projects will be added here over time.</p>
     </header>
+
+    <!-- ─── Topbar ─── -->
     <div class="topbar-panel">
-      <div class="topbar-card">
-        <span class="panel-chip">Ambient Pulse</span>
+      <div class="card topbar-card">
+        <span class="card-chip">🎧 Hotline Miami 2 Soundtrack</span>
         <h2>Soundscape Control</h2>
-        <p>Low-volume ambient music enhances the cyber dashboard. Play, pause, mute, and adjust volume anytime.</p>
+        <p>Immerse yourself in the atmospheric Hotline Miami 2 Main Menu soundtrack.</p>
         <div class="music-row">
           <div class="music-controls">
-            <button type="button" id="musicPlay">Play</button>
-            <button type="button" id="musicPause">Pause</button>
-            <button type="button" id="musicMute">Mute</button>
+            <button id="musicPlay">▶ Play</button>
+            <button id="musicPause">⏸ Pause</button>
+            <button id="musicMute">🔇 Mute</button>
+            <button id="musicRestart">⏹ Restart</button>
           </div>
-          <label class="volume-label">Volume <input id="musicVolume" class="music-slider" type="range" min="0" max="1" step="0.01" value="0.22"></label>
+          <label class="volume-label">
+            Volume
+            <input id="musicVolume" class="music-slider" type="range" min="0" max="1" step="0.01" value="0.25">
+          </label>
         </div>
-        <div class="music-status" id="musicStatus">Paused. Start the ambient soundscape when ready.</div>
+        <div class="music-status" id="musicStatus">
+          <span class="status-text">🎵 Ready</span>
+          <span class="track-name">🎵 Hotline Miami 2 - Main Menu</span>
+        </div>
+        <div class="progress-bar" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
       </div>
-      <div class="topbar-card">
-        <span class="panel-chip">Live Metrics</span>
+
+      <div class="card topbar-card">
+        <span class="card-chip">📊 Live Metrics</span>
         <h2>Dashboard Insights</h2>
         <div class="metric-grid">
-          <div class="metric-card"><h3>Available Tools</h3><p id="activeToolCount">10</p></div>
+          <div class="metric-card"><h3>Available Tools</h3><p id="activeToolCount">11</p></div>
           <div class="metric-card"><h3>Recent Actions</h3><p id="recentActionCount">1</p></div>
         </div>
-        <div class="activity-log" id="activityLog"><div class="activity-item">Dashboard initialized.</div></div>
+        <div class="activity-log" id="activityLog">
+          <div class="activity-item">🚀 Dashboard initialized.</div>
+        </div>
       </div>
     </div>
+
+    <!-- ─── Hub Screen ─── -->
     <div class="hub-screen">
       <div class="hub-search-card">
         <div class="search-box">
-          <input id="toolSearch" type="search" placeholder="Search tools or quick actions..." autocomplete="off" />
-          <button type="button" class="secondary" id="clearSearch">Clear</button>
+          <input id="toolSearch" type="search" placeholder="🔍 Search tools or actions..." autocomplete="off" />
+          <button class="btn btn-secondary btn-small" id="clearSearch">✕ Clear</button>
         </div>
         <div class="search-results" id="searchResults"></div>
       </div>
-      <div class="hub-grid">
-        <button type="button" class="tool-card" data-tool="cipher">
+
+      <div class="hub-grid" id="hubGrid">
+        <button class="tool-card" data-tool="cipher">
+          <span class="card-emoji">🔐</span>
           <h2>Cipher Studio</h2>
           <p>Encrypt, decrypt, and analyze text with multiple cipher algorithms.</p>
         </button>
-        <button type="button" class="tool-card" data-tool="qr">
+        <button class="tool-card" data-tool="qr">
+          <span class="card-emoji">📱</span>
           <h2>QR Code Generator</h2>
           <p>Generate a QR code instantly from any link.</p>
         </button>
-        <button type="button" class="tool-card" data-tool="htmlbuilder">
-          <h2>HTML File Builder</h2>
-          <p>Create an .html file from raw HTML source and download it instantly.</p>
+        <button class="tool-card" data-tool="htmlbuilder">
+          <span class="card-emoji">📝</span>
+          <h2>HTML Builder</h2>
+          <p>Create a downloadable .html file from raw HTML source.</p>
         </button>
-        <button type="button" class="tool-card" data-tool="customizer">
-          <h2>Transform</h2>
-          <p>Adjust the page, buttons, and colors for a premium custom HTML download.</p>
+        <button class="tool-card" data-tool="customizer">
+          <span class="card-emoji">🎨</span>
+          <h2>Theme Customizer</h2>
+          <p>Adjust colors, text, and buttons for a custom HTML download.</p>
         </button>
-        <button type="button" class="tool-card" data-tool="json">
+        <button class="tool-card" data-tool="json">
+          <span class="card-emoji">🗄️</span>
           <h2>JSON Formatter</h2>
-          <p>Validate and pretty-print JSON, and minify for compact output.</p>
+          <p>Validate, pretty-print, and minify JSON data.</p>
         </button>
-        <button type="button" class="tool-card" data-tool="image">
+        <button class="tool-card" data-tool="image">
+          <span class="card-emoji">🖼️</span>
           <h2>Image Resizer</h2>
-          <p>Resize an image client-side and download the result.</p>
+          <p>Resize images client-side and download the result.</p>
         </button>
-        <button type="button" class="tool-card" data-tool="password">
+        <button class="tool-card" data-tool="password">
+          <span class="card-emoji">🔑</span>
           <h2>Password Generator</h2>
           <p>Create strong, customizable passwords instantly.</p>
         </button>
-        <button type="button" class="tool-card" data-tool="urltools">
+        <button class="tool-card" data-tool="urltools">
+          <span class="card-emoji">🔗</span>
           <h2>URL Encoder/Decoder</h2>
           <p>Encode or decode URL components safely.</p>
         </button>
-        <button type="button" class="tool-card" data-tool="colors">
+        <button class="tool-card" data-tool="colors">
+          <span class="card-emoji">🎨</span>
           <h2>Color Extractor</h2>
           <p>Extract dominant colors from an image and copy hex values.</p>
         </button>
-        <button type="button" class="tool-card" data-tool="random">
+        <button class="tool-card" data-tool="random">
+          <span class="card-emoji">🎲</span>
           <h2>Random Number</h2>
-          <p>Generate a random number quickly from any min and max range.</p>
+          <p>Generate a random number within any range.</p>
         </button>
-        <button type="button" class="tool-card" data-tool="text">
+        <button class="tool-card" data-tool="text">
+          <span class="card-emoji">📊</span>
           <h2>Text Counter</h2>
           <p>Count words, characters, and lines in any text block.</p>
         </button>
       </div>
     </div>
 
-    <div class="tool-screen hidden">
+    <!-- ─── Tool Screen ─── -->
+    <div class="tool-screen" id="toolScreen">
       <div class="tool-header">
         <div>
-          <h1><span class="backdrop-text">Bricy's</span><span id="toolTitle">🔐 Cipher Studio</span></h1>
+          <h1><span id="toolTitle">🔐 Cipher Studio</span></h1>
           <p id="toolDesc">Encode, decode, and analyze text with multiple cipher algorithms</p>
         </div>
-        <button class="secondary" id="backButton">← Back to Hub</button>
+        <button class="btn btn-secondary" id="backButton">← Back to Hub</button>
       </div>
+
+      <!-- Cipher Panel -->
       <div class="cipher-panel hidden">
         <div class="main">
           <div class="left-panel">
             <div class="section-title">Algorithm</div>
-          <div class="algo-grid">
-            <button class="algo-btn active" data-algo="caesar">Caesar</button>
-            <button class="algo-btn" data-algo="vigenere">Vigenère</button>
-            <button class="algo-btn" data-algo="rot13">ROT13</button>
-            <button class="algo-btn" data-algo="atbash">Atbash</button>
-            <button class="algo-btn" data-algo="substitution">Substitution</button>
-            <button class="algo-btn" data-algo="base64">Base64</button>
-          </div>
-
-          <div class="field" id="keySection">
-            <label for="keyInput">Key / Keyword</label>
-            <input id="keyInput" type="text" value="3" placeholder="Enter key or keyword..." />
-            <div id="keyNote" class="note">For Caesar: number 1-25. For Vigenère: any keyword.</div>
-          </div>
-
-          <div class="section-title">Input</div>
-          <div class="field">
-            <textarea id="inputText" placeholder="Paste or type your text here..."></textarea>
-          </div>
-
-          <div class="action-buttons">
-            <button class="primary" id="encryptButton">Encrypt</button>
-            <button class="primary" id="decryptButton">Decrypt</button>
-          </div>
-          <div class="action-buttons">
-            <button class="secondary" id="bruteforceButton" style="grid-column: 1;">Caesar Brute Force</button>
-            <button class="secondary" id="clearButton" style="grid-column: 2;">Clear All</button>
-          </div>
-        </div>
-
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Encrypted Output</div>
-            <div class="output-text" id="encryptOutput"></div>
-            <button class="copy-button" id="copyEncrypt">Copy</button>
-          </div>
-
-          <div class="output-card">
-            <div class="output-label">Decrypted Output</div>
-            <div class="output-text" id="decryptOutput"></div>
-            <button class="copy-button" id="copyDecrypt">Copy</button>
-          </div>
-
-          <div id="bruteforceSection" style="display:none;">
-            <div class="output-label">Caesar Brute Force Results</div>
-            <div class="brute-list" id="bruteList"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="qr-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">Link to encode</div>
-          <div class="field">
-            <input id="qrLinkInput" type="url" placeholder="Enter a URL here" />
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="generateQrButton">Generate QR</button>
-            <button class="secondary" id="clearQrButton">Clear</button>
-          </div>
-          <div id="qrStatus" class="note"></div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">QR Code</div>
-            <div class="output-text" id="qrOutputWrapper" style="display:flex;justify-content:center;align-items:center;min-height:320px;">
-              <img id="qrImage" alt="QR Code" style="display:none;max-width:100%;height:auto;border-radius:12px;" />
+            <div class="algo-grid">
+              <button class="algo-btn active" data-algo="caesar">Caesar</button>
+              <button class="algo-btn" data-algo="vigenere">Vigenère</button>
+              <button class="algo-btn" data-algo="rot13">ROT13</button>
+              <button class="algo-btn" data-algo="atbash">Atbash</button>
+              <button class="algo-btn" data-algo="substitution">Substitution</button>
+              <button class="algo-btn" data-algo="base64">Base64</button>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="json-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">JSON Input</div>
-          <div class="field">
-            <textarea id="jsonInput" placeholder='Paste JSON here...'></textarea>
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="formatJsonBtn">Format</button>
-            <button class="secondary" id="minifyJsonBtn">Minify</button>
-          </div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Output</div>
-            <div class="output-text" id="jsonOutput">No result yet.</div>
-            <button class="copy-button" id="copyJsonBtn">Copy</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="image-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">Image Resizer</div>
-          <div class="field">
-            <input id="imageInput" type="file" accept="image/*" />
-            <label>Width (px)</label>
-            <input id="imageWidth" type="number" placeholder="e.g. 800" />
-            <label>Height (px, optional)</label>
-            <input id="imageHeight" type="number" placeholder="leave blank to preserve aspect" />
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="resizeImageBtn">Resize & Download</button>
-            <button class="secondary" id="clearImageBtn">Clear</button>
-          </div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Preview</div>
-            <div class="output-text" id="imagePreviewWrapper" style="display:flex;justify-content:center;align-items:center;min-height:240px;">
-              <img id="imagePreview" style="max-width:100%;height:auto;display:none;border-radius:8px;" />
+            <div class="field" id="keySection">
+              <label for="keyInput">Key / Keyword</label>
+              <input id="keyInput" type="text" value="3" placeholder="Enter key or keyword..." />
+              <div id="keyNote" class="note">For Caesar: number 1-25. For Vigenère: any keyword.</div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="password-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">Password Generator</div>
-          <div class="field">
-            <label>Length</label>
-            <input id="pwLength" type="number" value="16" min="4" max="128" />
-            <label><input id="pwLower" type="checkbox" checked /> Include lowercase</label>
-            <label><input id="pwUpper" type="checkbox" checked /> Include UPPERCASE</label>
-            <label><input id="pwNumbers" type="checkbox" checked /> Include numbers</label>
-            <label><input id="pwSymbols" type="checkbox" /> Include symbols</label>
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="genPwBtn">Generate</button>
-            <button class="secondary" id="clearPwBtn">Clear</button>
-          </div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Password</div>
-            <div class="output-text" id="pwOutput">No password yet.</div>
-            <button class="copy-button" id="copyPwBtn">Copy</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="urltools-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">URL Encode / Decode</div>
-          <div class="field">
-            <input id="urlToolInput" type="text" placeholder="Enter text or URL component" />
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="encodeUrlBtn">Encode</button>
-            <button class="secondary" id="decodeUrlBtn">Decode</button>
-          </div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Result</div>
-            <div class="output-text" id="urlToolResult">No result yet.</div>
-            <button class="copy-button" id="copyUrlToolBtn">Copy</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="random-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">Random Number Generator</div>
-          <div class="field">
-            <label for="randMin">Minimum</label>
-            <input id="randMin" type="number" value="1" />
-          </div>
-          <div class="field">
-            <label for="randMax">Maximum</label>
-            <input id="randMax" type="number" value="100" />
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="generateRandomBtn">Generate</button>
-            <button class="secondary" id="clearRandomBtn">Clear</button>
-          </div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Result</div>
-            <div class="output-text" id="randomResult">No number yet.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="text-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">Text Counter</div>
-          <div class="field">
-            <textarea id="textCounterInput" placeholder="Paste text here..."></textarea>
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="countTextBtn">Count</button>
-            <button class="secondary" id="clearTextBtn">Clear</button>
-          </div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Counts</div>
-            <div class="output-text" id="textResult">No text yet.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="colors-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">Color Extractor</div>
-          <div class="field">
-            <input id="colorImageInput" type="file" accept="image/*" />
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="extractColorsBtn">Extract Colors</button>
-            <button class="secondary" id="clearColorsBtn">Clear</button>
-          </div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Palette</div>
-            <div class="output-text" id="colorPalette" style="display:flex;gap:8px;flex-wrap:wrap;min-height:120px;align-items:center;">No colors yet.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="htmlbuilder-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">Raw HTML Source</div>
-          <div class="field">
-            <textarea id="htmlSourceInput" placeholder="Paste raw HTML here..."></textarea>
-          </div>
-          <div class="field">
-            <label for="htmlFilenameInput">File name</label>
-            <input id="htmlFilenameInput" type="text" placeholder="example.html" />
-          </div>
-          <div class="action-buttons">
-            <button class="primary" id="generateHtmlButton">Create HTML File</button>
-            <button class="secondary" id="clearHtmlButton">Clear</button>
-          </div>
-          <div id="htmlStatus" class="note">This tool packages raw HTML into a downloadable .html file.</div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Download Link</div>
-            <div class="output-text" id="htmlDownloadWrapper" style="display:flex;justify-content:center;align-items:center;min-height:320px;">
-              <a id="htmlDownloadLink" href="#" style="display:none;color:#7a7a7a;text-decoration:underline;" download>Download HTML File</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="customizer-panel hidden">
-      <div class="main">
-        <div class="left-panel">
-          <div class="section-title">Website Customizer</div>
-          <div class="field">
-            <label for="siteTitleInput">Site title</label>
-            <input id="siteTitleInput" type="text" value="Bricy's Hub" />
-          </div>
-          <div class="field">
-            <label for="siteSubtitleInput">Subtitle</label>
-            <textarea id="siteSubtitleInput" rows="3">Choose a tool to launch. More projects will be added here over time.</textarea>
-          </div>
-          <div class="field">
-            <label for="brandTextInput">Accent text</label>
-            <input id="brandTextInput" type="text" value="Bricy's" />
-          </div>
-          <div class="section-title">Colors</div>
-          <div class="field">
-            <label for="bgStartInput">Background start</label>
-            <input id="bgStartInput" type="color" value="#0f0f1e" />
-          </div>
-          <div class="field">
-            <label for="bgEndInput">Background end</label>
-            <input id="bgEndInput" type="color" value="#1a1a2e" />
-          </div>
-          <div class="field">
-            <label for="textColorInput">Text color</label>
-            <input id="textColorInput" type="color" value="#e0e0e0" />
-          </div>
-          <div class="field">
-            <label for="cardBgInput">Card background</label>
-            <input id="cardBgInput" type="color" value="#16213e" />
-          </div>
-          <div class="field">
-            <label for="cardTextInput">Card text color</label>
-            <input id="cardTextInput" type="color" value="#e0e0e0" />
-          </div>
-        </div>
-        <div class="right-panel">
-          <div class="output-card">
-            <div class="output-label">Cards / Buttons</div>
+            <div class="section-title">Input</div>
             <div class="field">
-              <label for="card1Label">Button 1 title</label>
-              <input id="card1Label" type="text" value="Cipher Studio" />
+              <textarea id="inputText" placeholder="Paste or type your text here..."></textarea>
+            </div>
+
+            <div class="action-buttons">
+              <button class="btn btn-primary" id="encryptButton">🔒 Encrypt</button>
+              <button class="btn btn-primary" id="decryptButton">🔓 Decrypt</button>
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-secondary" id="bruteforceButton">🔍 Caesar Brute Force</button>
+              <button class="btn btn-secondary" id="clearButton">🗑️ Clear All</button>
+            </div>
+          </div>
+
+          <div class="right-panel">
+            <div class="output-card">
+              <div class="output-label">Encrypted Output</div>
+              <div class="output-text" id="encryptOutput"></div>
+              <button class="copy-btn" id="copyEncrypt">📋 Copy</button>
+            </div>
+            <div class="output-card">
+              <div class="output-label">Decrypted Output</div>
+              <div class="output-text" id="decryptOutput"></div>
+              <button class="copy-btn" id="copyDecrypt">📋 Copy</button>
+            </div>
+            <div id="bruteforceSection" style="display:none;">
+              <div class="output-label">Brute Force Results</div>
+              <div class="brute-list" id="bruteList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QR Panel -->
+      <div class="qr-panel hidden">
+        <div class="main">
+          <div class="left-panel">
+            <div class="section-title">Link to Encode</div>
+            <div class="field">
+              <input id="qrLinkInput" type="url" placeholder="Enter a URL here" />
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" id="generateQrButton">Generate QR</button>
+              <button class="btn btn-secondary" id="clearQrButton">Clear</button>
+            </div>
+            <div id="qrStatus" class="note"></div>
+          </div>
+          <div class="right-panel">
+            <div class="output-card">
+              <div class="output-label">QR Code</div>
+              <div id="qrOutputWrapper">
+                <img id="qrImage" alt="QR Code" style="display:none;max-width:100%;height:auto;border-radius:12px;" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HTML Builder Panel -->
+      <div class="htmlbuilder-panel hidden">
+        <div class="main">
+          <div class="left-panel">
+            <div class="section-title">Raw HTML Source</div>
+            <div class="field">
+              <textarea id="htmlSourceInput" placeholder="Paste raw HTML here..."></textarea>
             </div>
             <div class="field">
-              <label for="card1Desc">Button 1 description</label>
-              <textarea id="card1Desc" rows="2">Encrypt, decrypt, and analyze text with multiple cipher algorithms.</textarea>
+              <label for="htmlFilenameInput">File name</label>
+              <input id="htmlFilenameInput" type="text" placeholder="example.html" />
             </div>
-            <div class="field">
-              <label for="card2Label">Button 2 title</label>
-              <input id="card2Label" type="text" value="QR Code Generator" />
+            <div class="action-buttons">
+              <button class="btn btn-primary" id="generateHtmlButton">📄 Create HTML File</button>
+              <button class="btn btn-secondary" id="clearHtmlButton">Clear</button>
             </div>
-            <div class="field">
-              <label for="card2Desc">Button 2 description</label>
-              <textarea id="card2Desc" rows="2">Generate a QR code instantly from any link.</textarea>
-            </div>
-            <div class="field">
-              <label for="card3Label">Button 3 title</label>
-              <input id="card3Label" type="text" value="HTML File Builder" />
-            </div>
-            <div class="field">
-              <label for="card3Desc">Button 3 description</label>
-              <textarea id="card3Desc" rows="2">Create an .html file from raw HTML source and download it instantly.</textarea>
-            </div>
-            <div class="field">
-              <label for="card4Label">Button 4 title</label>
-              <input id="card4Label" type="text" value="JSON Formatter" />
-            </div>
-            <div class="field">
-              <label for="card4Desc">Button 4 description</label>
-              <textarea id="card4Desc" rows="2">Validate and pretty-print JSON, and minify for compact output.</textarea>
+            <div id="htmlStatus" class="note">This tool packages raw HTML into a downloadable .html file.</div>
+          </div>
+          <div class="right-panel">
+            <div class="output-card">
+              <div class="output-label">Download Link</div>
+              <div id="htmlDownloadWrapper" class="flex-center" style="min-height:200px;">
+                <a id="htmlDownloadLink" href="#" style="display:none;color:var(--accent);text-decoration:underline;" download>Download HTML File</a>
+              </div>
             </div>
           </div>
-          <div class="output-card">
-            <div class="output-label">Download</div>
-            <div class="output-text" id="customHtmlDownloadWrapper" style="display:flex;justify-content:center;align-items:center;min-height:180px;">
-              <a id="customHtmlDownloadLink" href="#" style="display:none;color:#7a7a7a;text-decoration:underline;" download>Download Customized HTML</a>
+        </div>
+      </div>
+
+      <!-- Theme Customizer Panel -->
+      <div class="customizer-panel hidden">
+        <div class="main">
+          <div class="left-panel">
+            <div class="section-title">Website Customizer</div>
+            <div class="field">
+              <label for="siteTitleInput">Site title</label>
+              <input id="siteTitleInput" type="text" value="Bricy's Hub" />
             </div>
-            <div id="customizerStatus" class="note">Customize the page and click "Create Customized HTML".</div>
+            <div class="field">
+              <label for="siteSubtitleInput">Subtitle</label>
+              <textarea id="siteSubtitleInput" rows="2">Choose a tool to launch. More projects will be added here over time.</textarea>
+            </div>
+            <div class="field">
+              <label for="brandTextInput">Brand text</label>
+              <input id="brandTextInput" type="text" value="Bricy's" />
+            </div>
+            <div class="section-title">Colors</div>
+            <div class="field"><label>Background start</label><input id="bgStartInput" type="color" value="#0f0f1e" /></div>
+            <div class="field"><label>Background end</label><input id="bgEndInput" type="color" value="#1a1a2e" /></div>
+            <div class="field"><label>Text color</label><input id="textColorInput" type="color" value="#e0e0e0" /></div>
+            <div class="field"><label>Card background</label><input id="cardBgInput" type="color" value="#16213e" /></div>
+            <div class="field"><label>Card text</label><input id="cardTextInput" type="color" value="#e0e0e0" /></div>
           </div>
-          <div class="action-buttons">
-            <button class="primary" id="generateCustomHtmlBtn">Create Customized HTML</button>
-            <button class="secondary" id="resetCustomizerBtn">Reset</button>
+          <div class="right-panel">
+            <div class="output-card">
+              <div class="output-label">Card Content</div>
+              <div class="field"><label>Button 1 title</label><input id="card1Label" type="text" value="Cipher Studio" /></div>
+              <div class="field"><label>Button 1 desc</label><textarea id="card1Desc" rows="1">Encrypt, decrypt, and analyze text.</textarea></div>
+              <div class="field"><label>Button 2 title</label><input id="card2Label" type="text" value="QR Code Generator" /></div>
+              <div class="field"><label>Button 2 desc</label><textarea id="card2Desc" rows="1">Generate a QR code from any link.</textarea></div>
+              <div class="field"><label>Button 3 title</label><input id="card3Label" type="text" value="HTML Builder" /></div>
+              <div class="field"><label>Button 3 desc</label><textarea id="card3Desc" rows="1">Create a downloadable .html file.</textarea></div>
+              <div class="field"><label>Button 4 title</label><input id="card4Label" type="text" value="JSON Formatter" /></div>
+              <div class="field"><label>Button 4 desc</label><textarea id="card4Desc" rows="1">Validate and pretty-print JSON.</textarea></div>
+            </div>
+            <div class="output-card">
+              <div class="output-label">Download</div>
+              <div id="customHtmlDownloadWrapper" class="flex-center" style="min-height:100px;">
+                <a id="customHtmlDownloadLink" href="#" style="display:none;color:var(--accent);text-decoration:underline;" download>Download Customized HTML</a>
+              </div>
+              <div id="customizerStatus" class="note">Customize the page and click "Create Customized HTML".</div>
+              <div class="action-buttons" style="margin-top:12px;">
+                <button class="btn btn-primary" id="generateCustomHtmlBtn">Create Customized HTML</button>
+                <button class="btn btn-secondary" id="resetCustomizerBtn">Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JSON Panel -->
+      <div class="json-panel hidden">
+        <div class="main">
+          <div class="left-panel">
+            <div class="section-title">JSON Input</div>
+            <div class="field"><textarea id="jsonInput" placeholder='Paste JSON here...'></textarea></div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" id="formatJsonBtn">Format</button>
+              <button class="btn btn-secondary" id="minifyJsonBtn">Minify</button>
+            </div>
+          </div>
+          <div class="right-panel">
+            <div class="output-card">
+              <div class="output-label">Output</div>
+              <div class="output-text" id="jsonOutput">No result yet.</div>
+              <button class="copy-btn" id="copyJsonBtn">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Panel -->
+      <div class="image-panel hidden">
+        <div class="main">
+          <div class="left-panel">
+            <div class="section-title">Image Resizer</div>
+            <div class="field"><input id="imageInput" type="file" accept="image/*" /></div>
+            <div class="field"><label>Width (px)</label><input id="imageWidth" type="number" placeholder="e.g. 800" /></div>
+            <div class="field"><label>Height (px, optional)</label><input id="imageHeight" type="number" placeholder="leave blank to preserve aspect" /></div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" id="resizeImageBtn">Resize & Download</button>
+              <button class="btn btn-secondary" id="clearImageBtn">Clear</button>
+            </div>
+          </div>
+          <div class="right-panel">
+            <div class="output-card">
+              <div class="output-label">Preview</div>
+              <div id="imagePreviewWrapper" class="flex-center" style="min-height:200px;">
+                <img id="imagePreview" style="max-width:100%;height:auto;display:none;border-radius:8px;" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Password Panel -->
+      <div class="password-panel hidden">
+        <div class="main">
+          <div class="left-panel">
+            <div class="section-title">Password Generator</div>
+            <div class="field"><label>Length</label><input id="pwLength" type="number" value="16" min="4" max="128" /></div>
+            <div class="field"><label><input id="pwLower" type="checkbox" checked /> Include lowercase</label></div>
+            <div class="field"><label><input id="pwUpper" type="checkbox" checked /> Include UPPERCASE</label></div>
+            <div class="field"><label><input id="pwNumbers" type="checkbox" checked /> Include numbers</label></div>
+            <div class="field"><label><input id="pwSymbols" type="checkbox" /> Include symbols</label></div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" id="genPwBtn">Generate</button>
+              <button class="btn btn-secondary" id="clearPwBtn">Clear</button>
+            </div>
+          </div>
+          <div class="right-panel">
+            <div class="output-card">
+              <div class="output-label">Password</div>
+              <div class="output-text" id="pwOutput">No password yet.</div>
+              <button class="copy-btn" id="copyPwBtn">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- URL Tools Panel -->
+      <div class="urltools-panel hidden">
+        <div class="main">
+          <div class="left-panel">
+            <div class="section-title">URL Encode / Decode</div>
+            <div class="field"><input id="urlToolInput" type="text" placeholder="Enter text or URL component" /></div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" id="encodeUrlBtn">Encode</button>
+              <button class="btn btn-secondary" id="decodeUrlBtn">Decode</button>
+            </div>
+          </div>
+          <div class="right-panel">
+            <div class="output-card">
+              <div class="output-label">Result</div>
+              <div class="output-text" id="urlToolResult">No result yet.</div>
+              <button class="copy-btn" id="copyUrlToolBtn">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Random Panel -->
+      <div class="random-panel hidden">
+        <div class="main">
+          <div class="left-panel">
+            <div class="section-title">Random Number</div>
+            <div class="field"><label>Minimum</label><input id="randMin" type="number" value="1" /></div>
+            <div class="field"><label>Maximum</label><input id="randMax" type="number" value="100" /></div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" id="generateRandomBtn">Generate</button>
+              <button class="btn btn-secondary" id="clearRandomBtn">Clear</button>
+            </div>
+          </div>
+          <div class="right-panel">
+            <div class="output-card">
+              <div class="output-label">Result</div>
+              <div class="output-text" id="randomResult">No number yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text Counter Panel -->
+      <div class="text-panel hidden">
+        <div class="main">
+          <div class="left-panel">
+            <div class="section-title">Text Counter</div>
+            <div class="field"><textarea id="textCounterInput" placeholder="Paste text here..."></textarea></div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" id="countTextBtn">Count</button>
+              <button class="btn btn-secondary" id="clearTextBtn">Clear</button>
+            </div>
+          </div>
+          <div class="right-panel">
+            <div class="output-card">
+              <div class="output-label">Counts</div>
+              <div class="output-text" id="textResult">No text yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Color Extractor Panel -->
+      <div class="colors-panel hidden">
+        <div class="main">
+          <div class="left-panel">
+            <div class="section-title">Color Extractor</div>
+            <div class="field"><input id="colorImageInput" type="file" accept="image/*" /></div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" id="extractColorsBtn">Extract Colors</button>
+              <button class="btn btn-secondary" id="clearColorsBtn">Clear</button>
+            </div>
+          </div>
+          <div class="right-panel">
+            <div class="output-card">
+              <div class="output-label">Palette</div>
+              <div id="colorPalette" class="flex-center" style="min-height:80px;flex-wrap:wrap;gap:10px;">No colors yet.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -882,1018 +1241,1221 @@
   </div>
 
   <script>
-    const inputText = document.getElementById('inputText');
-    const keyInput = document.getElementById('keyInput');
-    const keySection = document.getElementById('keySection');
-    const keyNote = document.getElementById('keyNote');
-    const encryptOutput = document.getElementById('encryptOutput');
-    const decryptOutput = document.getElementById('decryptOutput');
-    const bruteList = document.getElementById('bruteList');
-    const bruteSection = document.getElementById('bruteforceSection');
-    const encryptButton = document.getElementById('encryptButton');
-    const decryptButton = document.getElementById('decryptButton');
-    const bruteforceButton = document.getElementById('bruteforceButton');
-    const clearButton = document.getElementById('clearButton');
-    const algoButtons = document.querySelectorAll('.algo-btn');
-    const toolCards = document.querySelectorAll('.tool-card');
-    const hubGrid = document.querySelector('.hub-grid');
-    const hubScreen = document.querySelector('.hub-screen');
-    const toolScreen = document.querySelector('.tool-screen');
-    const cipherPanel = document.querySelector('.cipher-panel');
-    const qrPanel = document.querySelector('.qr-panel');
-    const backButton = document.getElementById('backButton');
-    const toolTitle = document.getElementById('toolTitle');
-    const toolDesc = document.getElementById('toolDesc');
-    let currentQrObjectUrl = null;
-    let currentHtmlObjectUrl = null;
-    let currentImagePreviewUrl = null;
-    const qrLinkInput = document.getElementById('qrLinkInput');
-    const randomPanel = document.querySelector('.random-panel');
-    const textPanel = document.querySelector('.text-panel');
-    const randMin = document.getElementById('randMin');
-    const randMax = document.getElementById('randMax');
-    const generateRandomBtn = document.getElementById('generateRandomBtn');
-    const clearRandomBtn = document.getElementById('clearRandomBtn');
-    const randomResult = document.getElementById('randomResult');
-    const textCounterInput = document.getElementById('textCounterInput');
-    const countTextBtn = document.getElementById('countTextBtn');
-    const textResult = document.getElementById('textResult');
-    const clearTextBtn = document.getElementById('clearTextBtn');
-    const generateQrButton = document.getElementById('generateQrButton');
-    const clearQrButton = document.getElementById('clearQrButton');
-    const qrStatus = document.getElementById('qrStatus');
-    const qrImage = document.getElementById('qrImage');
-    const htmlSourceInput = document.getElementById('htmlSourceInput');
-    const htmlFilenameInput = document.getElementById('htmlFilenameInput');
-    const generateHtmlButton = document.getElementById('generateHtmlButton');
-    const clearHtmlButton = document.getElementById('clearHtmlButton');
-    const htmlStatus = document.getElementById('htmlStatus');
-    const htmlDownloadLink = document.getElementById('htmlDownloadLink');
-    const customizerPanel = document.querySelector('.customizer-panel');
-    const siteTitleInput = document.getElementById('siteTitleInput');
-    const siteSubtitleInput = document.getElementById('siteSubtitleInput');
-    const brandTextInput = document.getElementById('brandTextInput');
-    const bgStartInput = document.getElementById('bgStartInput');
-    const bgEndInput = document.getElementById('bgEndInput');
-    const textColorInput = document.getElementById('textColorInput');
-    const cardBgInput = document.getElementById('cardBgInput');
-    const cardTextInput = document.getElementById('cardTextInput');
-    const card1Label = document.getElementById('card1Label');
-    const card1Desc = document.getElementById('card1Desc');
-    const card2Label = document.getElementById('card2Label');
-    const card2Desc = document.getElementById('card2Desc');
-    const card3Label = document.getElementById('card3Label');
-    const card3Desc = document.getElementById('card3Desc');
-    const card4Label = document.getElementById('card4Label');
-    const card4Desc = document.getElementById('card4Desc');
-    const generateCustomHtmlBtn = document.getElementById('generateCustomHtmlBtn');
-    const resetCustomizerBtn = document.getElementById('resetCustomizerBtn');
-    const customHtmlDownloadLink = document.getElementById('customHtmlDownloadLink');
-    const customizerStatus = document.getElementById('customizerStatus');
-    const jsonPanel = document.querySelector('.json-panel');
-    const jsonInput = document.getElementById('jsonInput');
-    const formatJsonBtn = document.getElementById('formatJsonBtn');
-    const minifyJsonBtn = document.getElementById('minifyJsonBtn');
-    const jsonOutput = document.getElementById('jsonOutput');
-    const copyJsonBtn = document.getElementById('copyJsonBtn');
+    (function() {
+      'use strict';
 
-    const imagePanel = document.querySelector('.image-panel');
-    const imageInput = document.getElementById('imageInput');
-    const imageWidth = document.getElementById('imageWidth');
-    const imageHeight = document.getElementById('imageHeight');
-    const resizeImageBtn = document.getElementById('resizeImageBtn');
-    const clearImageBtn = document.getElementById('clearImageBtn');
-    const imagePreview = document.getElementById('imagePreview');
+      // ─── DOM Refs ───
+      const $ = (sel, ctx = document) => ctx.querySelector(sel);
+      const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
-    const passwordPanel = document.querySelector('.password-panel');
-    const pwLength = document.getElementById('pwLength');
-    const pwLower = document.getElementById('pwLower');
-    const pwUpper = document.getElementById('pwUpper');
-    const pwNumbers = document.getElementById('pwNumbers');
-    const pwSymbols = document.getElementById('pwSymbols');
-    const genPwBtn = document.getElementById('genPwBtn');
-    const clearPwBtn = document.getElementById('clearPwBtn');
-    const pwOutput = document.getElementById('pwOutput');
-    const copyPwBtn = document.getElementById('copyPwBtn');
+      const dom = {
+        particleCanvas: $('#particleCanvas'),
+        bgAudio: $('#bgAudio'),
+        audioUnlockOverlay: $('#audioUnlockOverlay'),
+        enableAudioBtn: $('#enableAudioBtn'),
 
-    const urlPanel = document.querySelector('.urltools-panel');
-    const urlToolInput = document.getElementById('urlToolInput');
-    const encodeUrlBtn = document.getElementById('encodeUrlBtn');
-    const decodeUrlBtn = document.getElementById('decodeUrlBtn');
-    const urlToolResult = document.getElementById('urlToolResult');
-    const copyUrlToolBtn = document.getElementById('copyUrlToolBtn');
+        hubScreen: document.querySelector('.hub-screen'),
+        toolScreen: $('#toolScreen'),
+        hubGrid: $('#hubGrid'),
+        toolCards: $$('.tool-card'),
 
-    const colorsPanel = document.querySelector('.colors-panel');
-    const colorImageInput = document.getElementById('colorImageInput');
-    const extractColorsBtn = document.getElementById('extractColorsBtn');
-    const clearColorsBtn = document.getElementById('clearColorsBtn');
-    const colorPalette = document.getElementById('colorPalette');
-    const copyEncryptBtn = document.getElementById('copyEncrypt');
-    const copyDecryptBtn = document.getElementById('copyDecrypt');
-    const toolSearch = document.getElementById('toolSearch');
-    const clearSearch = document.getElementById('clearSearch');
-    const searchResults = document.getElementById('searchResults');
-    const musicPlay = document.getElementById('musicPlay');
-    const musicPause = document.getElementById('musicPause');
-    const musicMute = document.getElementById('musicMute');
-    const musicVolume = document.getElementById('musicVolume');
-    const musicStatus = document.getElementById('musicStatus');
-    const bgAudio = document.getElementById('bgAudio');
-    if (bgAudio && typeof embeddedAudioData !== 'undefined') {
-      bgAudio.src = embeddedAudioData;
-    }
-    const audioUnlockOverlay = document.getElementById('audioUnlockOverlay');
-    const enableAudioBtn = document.getElementById('enableAudioBtn');
-    const activeToolCount = document.getElementById('activeToolCount');
-    const recentActionCount = document.getElementById('recentActionCount');
-    const activityLog = document.getElementById('activityLog');
-    const particleCanvas = document.getElementById('particleCanvas');
-    const particleCtx = particleCanvas ? particleCanvas.getContext('2d') : null;
-    const particles = [];
-    const particleCount = 64;
+        toolTitle: $('#toolTitle'),
+        toolDesc: $('#toolDesc'),
+        backButton: $('#backButton'),
 
-    function showHub() {
-      toolScreen.classList.add('hidden');
-      hubScreen.classList.remove('hidden');
-    }
+        musicPlay: $('#musicPlay'),
+        musicPause: $('#musicPause'),
+        musicMute: $('#musicMute'),
+        musicRestart: $('#musicRestart'),
+        musicVolume: $('#musicVolume'),
+        musicStatus: $('#musicStatus'),
+        progressFill: $('#progressFill'),
+        progressBar: $('#progressBar'),
 
-    function showToolPanel(toolName) {
-      // hide all known panels
-      cipherPanel.classList.add('hidden');
-      qrPanel.classList.add('hidden');
-      const htmlbuilderPanel = document.querySelector('.htmlbuilder-panel');
-      if (htmlbuilderPanel) htmlbuilderPanel.classList.add('hidden');
-      if (jsonPanel) jsonPanel.classList.add('hidden');
-      if (imagePanel) imagePanel.classList.add('hidden');
-      if (passwordPanel) passwordPanel.classList.add('hidden');
-      if (urlPanel) urlPanel.classList.add('hidden');
-      if (colorsPanel) colorsPanel.classList.add('hidden');
-      if (customizerPanel) customizerPanel.classList.add('hidden');
+        activeToolCount: $('#activeToolCount'),
+        recentActionCount: $('#recentActionCount'),
+        activityLog: $('#activityLog'),
 
-      // show selected
-      if (toolName === 'cipher') cipherPanel.classList.remove('hidden');
-      else if (toolName === 'qr') qrPanel.classList.remove('hidden');
-      else if (toolName === 'htmlbuilder' && htmlbuilderPanel) htmlbuilderPanel.classList.remove('hidden');
-      else if (toolName === 'json' && jsonPanel) jsonPanel.classList.remove('hidden');
-      else if (toolName === 'image' && imagePanel) imagePanel.classList.remove('hidden');
-      else if (toolName === 'password' && passwordPanel) passwordPanel.classList.remove('hidden');
-      else if (toolName === 'urltools' && urlPanel) urlPanel.classList.remove('hidden');
-      else if (toolName === 'colors' && colorsPanel) colorsPanel.classList.remove('hidden');
-      else if (toolName === 'customizer' && customizerPanel) customizerPanel.classList.remove('hidden');
-    }
+        toolSearch: $('#toolSearch'),
+        clearSearch: $('#clearSearch'),
+        searchResults: $('#searchResults'),
 
-    function logDashboardAction(message) {
-      if (!activityLog) return;
-      const item = document.createElement('div');
-      item.className = 'activity-item';
-      item.textContent = message;
-      activityLog.prepend(item);
-      const count = activityLog.querySelectorAll('.activity-item').length;
-      if (recentActionCount) recentActionCount.textContent = count.toString();
-    }
+        // Cipher
+        inputText: $('#inputText'),
+        keyInput: $('#keyInput'),
+        keySection: $('#keySection'),
+        keyNote: $('#keyNote'),
+        encryptOutput: $('#encryptOutput'),
+        decryptOutput: $('#decryptOutput'),
+        bruteList: $('#bruteList'),
+        bruteSection: $('#bruteforceSection'),
+        encryptButton: $('#encryptButton'),
+        decryptButton: $('#decryptButton'),
+        bruteforceButton: $('#bruteforceButton'),
+        clearButton: $('#clearButton'),
+        algoButtons: $$('.algo-btn'),
+        copyEncrypt: $('#copyEncrypt'),
+        copyDecrypt: $('#copyDecrypt'),
 
-    function updateDashboardMetrics() {
-      if (activeToolCount) activeToolCount.textContent = toolCards.length.toString();
-    }
+        // QR
+        qrLinkInput: $('#qrLinkInput'),
+        generateQrButton: $('#generateQrButton'),
+        clearQrButton: $('#clearQrButton'),
+        qrStatus: $('#qrStatus'),
+        qrImage: $('#qrImage'),
 
-    function renderSearchResults(query) {
-      if (!searchResults) return;
-      const normalized = query.trim().toLowerCase();
-      if (!normalized) {
-        searchResults.innerHTML = '';
-        return;
-      }
-      const matches = [];
-      toolCards.forEach(card => {
-        const title = card.querySelector('h2')?.textContent || '';
-        const desc = card.querySelector('p')?.textContent || '';
-        const titleLower = title.toLowerCase();
-        const descLower = desc.toLowerCase();
-        if (titleLower.includes(normalized) || descLower.includes(normalized) || card.dataset.tool?.includes(normalized)) {
-          matches.push({ tool: card.dataset.tool, title, desc });
-        }
-      });
-      if (!matches.length) {
-        searchResults.innerHTML = '<div class="search-result"><h3>No matching tools found</h3><p>Try another keyword.</p></div>';
-        return;
-      }
-      searchResults.innerHTML = matches.map(entry => `
-        <div class="search-result">
-          <div>
-            <h3>${entry.title}</h3>
-            <p>${entry.desc}</p>
-          </div>
-          <button type="button" data-tool="${entry.tool}">Open</button>
-        </div>
-      `).join('');
-    }
+        // HTML Builder
+        htmlSourceInput: $('#htmlSourceInput'),
+        htmlFilenameInput: $('#htmlFilenameInput'),
+        generateHtmlButton: $('#generateHtmlButton'),
+        clearHtmlButton: $('#clearHtmlButton'),
+        htmlStatus: $('#htmlStatus'),
+        htmlDownloadLink: $('#htmlDownloadLink'),
 
-    let isMuted = false;
+        // Customizer
+        siteTitleInput: $('#siteTitleInput'),
+        siteSubtitleInput: $('#siteSubtitleInput'),
+        brandTextInput: $('#brandTextInput'),
+        bgStartInput: $('#bgStartInput'),
+        bgEndInput: $('#bgEndInput'),
+        textColorInput: $('#textColorInput'),
+        cardBgInput: $('#cardBgInput'),
+        cardTextInput: $('#cardTextInput'),
+        card1Label: $('#card1Label'),
+        card1Desc: $('#card1Desc'),
+        card2Label: $('#card2Label'),
+        card2Desc: $('#card2Desc'),
+        card3Label: $('#card3Label'),
+        card3Desc: $('#card3Desc'),
+        card4Label: $('#card4Label'),
+        card4Desc: $('#card4Desc'),
+        generateCustomHtmlBtn: $('#generateCustomHtmlBtn'),
+        resetCustomizerBtn: $('#resetCustomizerBtn'),
+        customHtmlDownloadLink: $('#customHtmlDownloadLink'),
+        customizerStatus: $('#customizerStatus'),
 
-    function initAmbientAudio() {
-      if (!bgAudio) return;
-      bgAudio.volume = parseFloat(musicVolume?.value || 0.22);
-      bgAudio.muted = isMuted;
-      bgAudio.loop = true;
-    }
+        // JSON
+        jsonInput: $('#jsonInput'),
+        formatJsonBtn: $('#formatJsonBtn'),
+        minifyJsonBtn: $('#minifyJsonBtn'),
+        jsonOutput: $('#jsonOutput'),
+        copyJsonBtn: $('#copyJsonBtn'),
 
-    // Attempt to unlock audio on the first user gesture (fixes hosted-site autoplay blocks)
-    function unlockAudio() {
-      try {
-        if (bgAudio && bgAudio.paused) {
-          bgAudio.play().then(() => {
-            setMusicStatus('Ambient sound unlocked and playing.');
-            logDashboardAction('Audio unlocked via user gesture.');
-            if (audioUnlockOverlay) {
-              audioUnlockOverlay.style.display = 'none';
-              audioUnlockOverlay.setAttribute('aria-hidden', 'true');
-            }
-          }).catch(() => {
-            // ignore
-          });
-        }
-        if (window.AudioContext || window.webkitAudioContext) {
-          // create+resume a short AudioContext to satisfy some autoplay policies
-          const C = window.AudioContext || window.webkitAudioContext;
-          const ac = new C();
-          if (ac.state === 'suspended' && typeof ac.resume === 'function') ac.resume().catch(() => {});
-        }
-      } catch (e) {
-        // ignore
-      }
-      try { document.removeEventListener('click', unlockAudio); } catch (e) {}
-    }
+        // Image
+        imageInput: $('#imageInput'),
+        imageWidth: $('#imageWidth'),
+        imageHeight: $('#imageHeight'),
+        resizeImageBtn: $('#resizeImageBtn'),
+        clearImageBtn: $('#clearImageBtn'),
+        imagePreview: $('#imagePreview'),
 
-    function setMusicStatus(text) {
-      if (musicStatus) musicStatus.textContent = text;
-    }
+        // Password
+        pwLength: $('#pwLength'),
+        pwLower: $('#pwLower'),
+        pwUpper: $('#pwUpper'),
+        pwNumbers: $('#pwNumbers'),
+        pwSymbols: $('#pwSymbols'),
+        genPwBtn: $('#genPwBtn'),
+        clearPwBtn: $('#clearPwBtn'),
+        pwOutput: $('#pwOutput'),
+        copyPwBtn: $('#copyPwBtn'),
 
-    function setMusicVolume(value) {
-      if (!bgAudio) return;
-      bgAudio.volume = parseFloat(value);
-      if (isMuted) {
-        bgAudio.muted = true;
-      }
-    }
+        // URL Tools
+        urlToolInput: $('#urlToolInput'),
+        encodeUrlBtn: $('#encodeUrlBtn'),
+        decodeUrlBtn: $('#decodeUrlBtn'),
+        urlToolResult: $('#urlToolResult'),
+        copyUrlToolBtn: $('#copyUrlToolBtn'),
 
-    function toggleMute() {
-      if (!bgAudio) return;
-      isMuted = !isMuted;
-      bgAudio.muted = isMuted;
-      if (isMuted) {
-        if (musicMute) musicMute.textContent = 'Unmute';
-        setMusicStatus('Ambient sound is muted.');
-      } else {
-        if (musicMute) musicMute.textContent = 'Mute';
-        setMusicStatus('Ambient sound is unmuted.');
-      }
-    }
+        // Random
+        randMin: $('#randMin'),
+        randMax: $('#randMax'),
+        generateRandomBtn: $('#generateRandomBtn'),
+        clearRandomBtn: $('#clearRandomBtn'),
+        randomResult: $('#randomResult'),
 
-    function startAmbientSound() {
-      if (!bgAudio) {
-        setMusicStatus('Audio source unavailable.');
-        return;
-      }
-      initAmbientAudio();
-      bgAudio.play().then(() => {
-        setMusicStatus('Ambient sound is playing.');
-        logDashboardAction('Ambient sound started.');
-      }).catch(error => {
-        console.error(error);
-        setMusicStatus('Playback blocked until user interaction. Click anywhere to enable audio.');
-        if (audioUnlockOverlay) {
-          audioUnlockOverlay.style.display = 'flex';
-          audioUnlockOverlay.setAttribute('aria-hidden', 'false');
-        }
-        document.addEventListener('click', unlockAudio, { once: true });
-      });
-    }
+        // Text Counter
+        textCounterInput: $('#textCounterInput'),
+        countTextBtn: $('#countTextBtn'),
+        clearTextBtn: $('#clearTextBtn'),
+        textResult: $('#textResult'),
 
-    function pauseAmbientSound() {
-      if (!bgAudio) return;
-      bgAudio.pause();
-      setMusicStatus('Ambient sound paused.');
-      logDashboardAction('Ambient sound paused.');
-    }
-
-    function bindDashboardControls() {
-      if (toolSearch) {
-        toolSearch.addEventListener('input', () => {
-          renderSearchResults(toolSearch.value);
-        });
-      }
-      if (clearSearch) {
-        clearSearch.addEventListener('click', () => {
-          if (toolSearch) toolSearch.value = '';
-          renderSearchResults('');
-          logDashboardAction('Search cleared.');
-        });
-      }
-      if (searchResults) {
-        searchResults.addEventListener('click', event => {
-          const action = event.target.closest('button[data-tool]');
-          if (action) {
-            selectTool(action.dataset.tool);
-            renderSearchResults('');
-            if (toolSearch) toolSearch.value = '';
-            logDashboardAction(`Opened tool: ${action.dataset.tool}`);
-          }
-        });
-      }
-      if (musicPlay) musicPlay.addEventListener('click', startAmbientSound);
-      if (musicPause) musicPause.addEventListener('click', pauseAmbientSound);
-      if (musicMute) musicMute.addEventListener('click', toggleMute);
-      if (musicVolume) musicVolume.addEventListener('input', event => {
-        setMusicVolume(event.target.value);
-        setMusicStatus(`Volume set to ${Math.round(parseFloat(event.target.value) * 100)}%.`);
-      });
-      if (musicStatus && !musicStatus.textContent.trim()) {
-        musicStatus.textContent = 'Ambient sound ready. Press play to start.';
-      }
-      // Overlay button hookup: allow explicit enable
-      if (enableAudioBtn) enableAudioBtn.addEventListener('click', unlockAudio);
-    }
-
-    function initDashboard() {
-      updateDashboardMetrics();
-      bindDashboardControls();
-      // ensure one user gesture can unlock audio on some browsers
-      try { document.addEventListener('click', unlockAudio, { once: true }); } catch (e) {}
-      logDashboardAction('Dashboard controls initialized.');
-    }
-
-    function selectTool(toolName) {
-      hubScreen.classList.add('hidden');
-      toolScreen.classList.remove('hidden');
-      if (toolName === 'cipher') {
-        toolTitle.textContent = '🔐 Cipher Studio';
-        toolDesc.textContent = 'Encode, decode, and analyze text with multiple cipher algorithms';
-      } else if (toolName === 'qr') {
-        toolTitle.textContent = '📱 QR Code Generator';
-        toolDesc.textContent = 'Generate a QR code from any link instantly.';
-      } else if (toolName === 'htmlbuilder') {
-        toolTitle.textContent = '📝 HTML File Builder';
-        toolDesc.textContent = 'Create a downloadable HTML file from raw HTML source.';
-      } else if (toolName === 'customizer') {
-        toolTitle.textContent = '🛠️ Transform';
-        toolDesc.textContent = 'Tune the page, buttons, and colors for a cinematic custom HTML download.';
-      } else if (toolName === 'json') {
-        toolTitle.textContent = '🗄️ JSON Formatter';
-        toolDesc.textContent = 'Validate, pretty-print, and minify JSON.';
-      } else if (toolName === 'image') {
-        toolTitle.textContent = '🖼️ Image Resizer';
-        toolDesc.textContent = 'Resize images client-side and download the result.';
-      } else if (toolName === 'password') {
-        toolTitle.textContent = '🔑 Password Generator';
-        toolDesc.textContent = 'Create strong, customizable passwords instantly.';
-      } else if (toolName === 'urltools') {
-        toolTitle.textContent = '🔗 URL Encoder / Decoder';
-        toolDesc.textContent = 'Encode or decode URL components safely.';
-      } else if (toolName === 'random') {
-        toolTitle.textContent = '🎲 Random Number Generator';
-        toolDesc.textContent = 'Generate a random number between a min and max range.';
-      } else if (toolName === 'text') {
-        toolTitle.textContent = '📊 Text Counter';
-        toolDesc.textContent = 'Count words, characters, and lines in any text block.';
-      } else if (toolName === 'colors') {
-        toolTitle.textContent = '🎨 Color Extractor';
-        toolDesc.textContent = 'Extract dominant colors from an image and copy hex values.';
-      }
-      showToolPanel(toolName);
-    }
-
-    toolCards.forEach(card => {
-      card.addEventListener('click', () => selectTool(card.dataset.tool));
-    });
-    if (hubGrid) {
-      hubGrid.addEventListener('click', event => {
-        const card = event.target.closest('.tool-card');
-        if (card && card.dataset.tool) {
-          selectTool(card.dataset.tool);
-        }
-      });
-    }
-
-    function setupScrollReveal() {
-      const items = document.querySelectorAll('.tool-card, .main, .output-card');
-      items.forEach(el => el.classList.add('animate-reveal'));
-      const observer = new IntersectionObserver((entries, obs) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('reveal-visible');
-            obs.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.12 });
-      items.forEach(el => observer.observe(el));
-    }
-
-    function resizeParticleCanvas() {
-      if (!particleCanvas) return;
-      particleCanvas.width = window.innerWidth;
-      particleCanvas.height = window.innerHeight;
-    }
-
-    function createParticle() {
-      return {
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        vx: (Math.random() - 0.5) * 0.8,
-        vy: -Math.random() * 0.28 - 0.12,
-        size: Math.random() * 2.5 + 1.2,
-        alpha: Math.random() * 0.4 + 0.18
+        // Colors
+        colorImageInput: $('#colorImageInput'),
+        extractColorsBtn: $('#extractColorsBtn'),
+        clearColorsBtn: $('#clearColorsBtn'),
+        colorPalette: $('#colorPalette'),
       };
-    }
 
-    function drawParticles() {
-      if (!particleCanvas || !particleCtx) return;
-      particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-      particleCtx.fillStyle = 'rgba(255, 10, 10, 0.12)';
-      particleCtx.fillRect(0, 0, particleCanvas.width, particleCanvas.height);
-      particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.y < -20 || p.x < -24 || p.x > particleCanvas.width + 24) {
-          p.x = Math.random() * particleCanvas.width;
-          p.y = particleCanvas.height + 24;
-          p.vx = (Math.random() - 0.5) * 0.8;
-          p.vy = -Math.random() * 0.28 - 0.12;
-          p.alpha = Math.random() * 0.4 + 0.12;
+      // ─── State ───
+      let currentAlgo = 'caesar';
+      let currentQrObjectUrl = null;
+      let currentHtmlObjectUrl = null;
+      let currentImagePreviewUrl = null;
+      let currentCustomHtmlObjectUrl = null;
+      let isMuted = false;
+      let isAudioUnlocked = false;
+
+      // ─── TRACK LIST ───
+      const TRACK_LIST = [
+        { name: 'Hotline Miami 2 - Main Menu', url: 'https://weary-aqua-r1l9i7yd.edgeone.dev/Hotline%20Miami%202%20OST%20-%20Main%20Menu.mp3' },
+      ];
+      let currentTrackIndex = 0;
+
+      // ─── Utility ───
+      function escapeHtml(text) {
+        return text.replace(/[&<>"']/g, c =>
+          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] || c
+        );
+      }
+
+      function logDashboardAction(msg) {
+        if (!dom.activityLog) return;
+        const item = document.createElement('div');
+        item.className = 'activity-item';
+        item.textContent = msg;
+        dom.activityLog.prepend(item);
+        const count = dom.activityLog.querySelectorAll('.activity-item').length;
+        if (dom.recentActionCount) dom.recentActionCount.textContent = count.toString();
+        while (dom.activityLog.children.length > 20) {
+          dom.activityLog.removeChild(dom.activityLog.lastChild);
         }
-        particleCtx.beginPath();
-        particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        particleCtx.fillStyle = `rgba(255, 34, 34, ${p.alpha})`;
-        particleCtx.fill();
-      });
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 120) {
-            particleCtx.strokeStyle = `rgba(255, 30, 30, ${0.12 - dist / 1200})`;
-            particleCtx.lineWidth = 1;
-            particleCtx.beginPath();
-            particleCtx.moveTo(particles[i].x, particles[i].y);
-            particleCtx.lineTo(particles[j].x, particles[j].y);
-            particleCtx.stroke();
+      }
+
+      function updateDashboardMetrics() {
+        if (dom.activeToolCount) dom.activeToolCount.textContent = dom.toolCards.length.toString();
+      }
+
+      // ─── Particle System ───
+      function initParticles() {
+        const canvas = dom.particleCanvas;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const count = 64;
+
+        function resize() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function createParticle() {
+          return {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.6,
+            vy: -Math.random() * 0.3 - 0.08,
+            size: Math.random() * 2.2 + 1.0,
+            alpha: Math.random() * 0.35 + 0.15,
+          };
+        }
+
+        for (let i = 0; i < count; i++) particles.push(createParticle());
+
+        function draw() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = 'rgba(255, 10, 10, 0.06)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.y < -20 || p.x < -20 || p.x > canvas.width + 20) {
+              p.x = Math.random() * canvas.width;
+              p.y = canvas.height + 20;
+              p.vx = (Math.random() - 0.5) * 0.6;
+              p.vy = -Math.random() * 0.3 - 0.08;
+            }
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 34, 34, ${p.alpha})`;
+            ctx.fill();
+          });
+
+          for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+              const dx = particles[i].x - particles[j].x;
+              const dy = particles[i].y - particles[j].y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 100) {
+                ctx.strokeStyle = `rgba(255, 30, 30, ${0.10 - dist / 1000})`;
+                ctx.lineWidth = 0.8;
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.stroke();
+              }
+            }
+          }
+          requestAnimationFrame(draw);
+        }
+        draw();
+      }
+
+      // ─── Scroll Reveal ───
+      function initScrollReveal() {
+        const els = document.querySelectorAll('.tool-card, .main, .output-card, .topbar-card');
+        els.forEach(el => el.classList.add('animate-reveal'));
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('reveal-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.08 });
+        els.forEach(el => observer.observe(el));
+      }
+
+      // ─── AUDIO SYSTEM ───
+      function initAudio() {
+        const audio = dom.bgAudio;
+        if (!audio) return;
+        audio.volume = parseFloat(dom.musicVolume?.value || 0.25);
+        audio.muted = isMuted;
+        audio.loop = false;
+        
+        loadTrack(currentTrackIndex);
+        
+        audio.addEventListener('timeupdate', updateProgress);
+        audio.addEventListener('ended', onTrackEnd);
+        audio.addEventListener('loadedmetadata', () => {
+          updateStatus('Ready', '🎵');
+          const trackName = TRACK_LIST[currentTrackIndex]?.name || 'Unknown';
+          updateTrackDisplay(trackName);
+          logDashboardAction('🎵 Soundtrack loaded: ' + trackName);
+        });
+        audio.addEventListener('error', (e) => {
+          console.error('Audio error:', e);
+          updateStatus('Error loading track', '❌');
+        });
+      }
+
+      function loadTrack(index) {
+        const audio = dom.bgAudio;
+        if (!audio) return;
+        const track = TRACK_LIST[index];
+        if (!track) return;
+        audio.src = track.url;
+        audio.load();
+        updateTrackDisplay(track.name);
+      }
+
+      function updateTrackDisplay(trackName) {
+        const trackSpan = dom.musicStatus?.querySelector('.track-name');
+        if (trackSpan) {
+          trackSpan.textContent = '🎵 ' + trackName;
+        }
+      }
+
+      function updateStatus(text, emoji = '🎵') {
+        if (!dom.musicStatus) return;
+        const statusSpan = dom.musicStatus.querySelector('.status-text');
+        if (statusSpan) {
+          statusSpan.textContent = emoji + ' ' + text;
+        }
+      }
+
+      function updateProgress() {
+        const audio = dom.bgAudio;
+        if (!audio || !dom.progressFill) return;
+        if (audio.duration) {
+          const percent = (audio.currentTime / audio.duration) * 100;
+          dom.progressFill.style.width = percent + '%';
+        }
+      }
+
+      function onTrackEnd() {
+        const audio = dom.bgAudio;
+        if (audio) {
+          audio.currentTime = 0;
+          if (!audio.paused) {
+            audio.play().catch(() => {});
           }
         }
       }
-    }
 
-    function animateParticles() {
-      if (!particleCanvas || !particleCtx) return;
-      drawParticles();
-      requestAnimationFrame(animateParticles);
-    }
-
-    function initParticles() {
-      if (!particleCanvas || !particleCtx) return;
-      resizeParticleCanvas();
-      particles.length = 0;
-      for (let i = 0; i < particleCount; i += 1) {
-        particles.push(createParticle());
-      }
-      animateParticles();
-      window.addEventListener('resize', resizeParticleCanvas);
-    }
-
-    function initBackground() {
-      setupScrollReveal();
-      initParticles();
-    }
-
-    backButton.addEventListener('click', showHub);
-    generateQrButton.addEventListener('click', async () => {
-      const url = qrLinkInput.value.trim();
-      if (!url) {
-        qrStatus.textContent = 'Enter a valid link first.';
-        qrImage.style.display = 'none';
-        return;
-      }
-      qrStatus.textContent = 'Requesting QR code...';
-      qrImage.style.display = 'none';
-      if (currentQrObjectUrl) {
-        URL.revokeObjectURL(currentQrObjectUrl);
-        currentQrObjectUrl = null;
-      }
-      try {
-        const response = await fetch(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`);
-        if (!response.ok) {
-          throw new Error(`Request failed: ${response.status}`);
+      function playAudio() {
+        const audio = dom.bgAudio;
+        if (!audio) return;
+        
+        // If no source, load it
+        if (!audio.src) {
+          loadTrack(currentTrackIndex);
         }
-        const blob = await response.blob();
-        currentQrObjectUrl = URL.createObjectURL(blob);
-        qrImage.src = currentQrObjectUrl;
-        qrImage.style.display = 'block';
-        qrStatus.textContent = 'QR code generated successfully.';
-      } catch (error) {
-        qrStatus.textContent = 'Unable to generate QR code. Try again later.';
-        console.error('QR fetch error:', error);
+        
+        // First, try to resume any AudioContext
+        if (window.AudioContext || window.webkitAudioContext) {
+          try {
+            const C = window.AudioContext || window.webkitAudioContext;
+            const ac = new C();
+            if (ac.state === 'suspended') {
+              ac.resume().catch(() => {});
+            }
+          } catch (_) {}
+        }
+        
+        audio.play()
+          .then(() => {
+            isAudioUnlocked = true;
+            updateStatus('Playing', '▶');
+            if (dom.musicPlay) dom.musicPlay.classList.add('active');
+            if (dom.audioUnlockOverlay) {
+              dom.audioUnlockOverlay.style.display = 'none';
+              dom.audioUnlockOverlay.setAttribute('aria-hidden', 'true');
+            }
+            logDashboardAction('▶ Playing: ' + TRACK_LIST[currentTrackIndex].name);
+          })
+          .catch((error) => {
+            console.warn('Playback blocked:', error);
+            updateStatus('Click to enable audio', '⏸');
+            if (dom.audioUnlockOverlay) {
+              dom.audioUnlockOverlay.style.display = 'flex';
+              dom.audioUnlockOverlay.setAttribute('aria-hidden', 'false');
+            }
+          });
       }
-    });
 
-    clearQrButton.addEventListener('click', () => {
-      qrLinkInput.value = '';
-      qrStatus.textContent = '';
-      qrImage.src = '';
-      qrImage.style.display = 'none';
-      if (currentQrObjectUrl) {
-        URL.revokeObjectURL(currentQrObjectUrl);
-        currentQrObjectUrl = null;
+      function pauseAudio() {
+        const audio = dom.bgAudio;
+        if (!audio) return;
+        audio.pause();
+        updateStatus('Paused', '⏸');
+        if (dom.musicPlay) dom.musicPlay.classList.remove('active');
+        logDashboardAction('⏸ Paused soundtrack');
       }
-    });
 
-    function getRandomNumber(min, max) {
-      const lower = Math.ceil(Math.min(min, max));
-      const upper = Math.floor(Math.max(min, max));
-      if (Number.isNaN(lower) || Number.isNaN(upper) || lower > upper) return null;
-      return Math.floor(Math.random() * (upper - lower + 1)) + lower;
-    }
-
-    generateRandomBtn.addEventListener('click', () => {
-      const value = getRandomNumber(parseInt(randMin.value, 10), parseInt(randMax.value, 10));
-      randomResult.textContent = value === null ? 'Enter a valid min and max.' : value.toString();
-    });
-
-    clearRandomBtn.addEventListener('click', () => {
-      randMin.value = '1';
-      randMax.value = '100';
-      randomResult.textContent = 'No number yet.';
-    });
-
-    function formatTextCounts(text) {
-      const lines = text.split(/\r?\n/).filter(Boolean).length;
-      const words = text.trim().split(/\s+/).filter(Boolean).length;
-      const chars = text.length;
-      return `Lines: ${lines}\nWords: ${words}\nCharacters: ${chars}`;
-    }
-
-    countTextBtn.addEventListener('click', () => {
-      textResult.textContent = formatTextCounts(textCounterInput.value || '');
-    });
-
-    clearTextBtn.addEventListener('click', () => {
-      textCounterInput.value = '';
-      textResult.textContent = 'No text yet.';
-    });
-
-    generateHtmlButton.addEventListener('click', () => {
-      const html = htmlSourceInput.value;
-      if (!html.trim()) {
-        htmlStatus.textContent = 'Paste raw HTML before creating the file.';
-        htmlDownloadLink.style.display = 'none';
-        return;
+      function restartTrack() {
+        const audio = dom.bgAudio;
+        if (!audio) return;
+        audio.currentTime = 0;
+        if (audio.paused) {
+          playAudio();
+        } else {
+          updateStatus('Restarted', '⏹');
+        }
       }
-      const filename = htmlFilenameInput.value.trim() || 'page.html';
-      if (!filename.toLowerCase().endsWith('.html')) {
-        htmlStatus.textContent = 'Filename should end with .html. Adding extension automatically.';
+
+      function toggleMute() {
+        const audio = dom.bgAudio;
+        if (!audio) return;
+        isMuted = !isMuted;
+        audio.muted = isMuted;
+        if (dom.musicMute) dom.musicMute.textContent = isMuted ? '🔊 Unmute' : '🔇 Mute';
+        updateStatus(isMuted ? 'Muted' : 'Unmuted', isMuted ? '🔇' : '🔊');
       }
-      const safeFilename = filename.toLowerCase().endsWith('.html') ? filename : `${filename}.html`;
-      if (currentHtmlObjectUrl) {
-        URL.revokeObjectURL(currentHtmlObjectUrl);
-        currentHtmlObjectUrl = null;
+
+      function setVolume(value) {
+        const audio = dom.bgAudio;
+        if (!audio) return;
+        audio.volume = parseFloat(value);
+        updateStatus(`Volume: ${Math.round(parseFloat(value) * 100)}%`, '🔊');
       }
-      const blob = new Blob([html], { type: 'text/html' });
-      currentHtmlObjectUrl = URL.createObjectURL(blob);
-      htmlDownloadLink.href = currentHtmlObjectUrl;
-      htmlDownloadLink.download = safeFilename;
-      htmlDownloadLink.textContent = `Download ${safeFilename}`;
-      htmlDownloadLink.style.display = 'inline-block';
-      htmlStatus.textContent = 'HTML file ready. Click the link to download.';
-    });
 
-    clearHtmlButton.addEventListener('click', () => {
-      htmlSourceInput.value = '';
-      htmlFilenameInput.value = '';
-      htmlStatus.textContent = 'This tool packages raw HTML into a downloadable .html file.';
-      htmlDownloadLink.href = '#';
-      htmlDownloadLink.textContent = 'Download HTML File';
-      htmlDownloadLink.style.display = 'none';
-      if (currentHtmlObjectUrl) {
-        URL.revokeObjectURL(currentHtmlObjectUrl);
-        currentHtmlObjectUrl = null;
+      function seekAudio(e) {
+        const audio = dom.bgAudio;
+        if (!audio || !audio.duration || !dom.progressBar) return;
+        const rect = dom.progressBar.getBoundingClientRect();
+        const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        audio.currentTime = percent * audio.duration;
       }
-    });
 
-    let currentCustomHtmlObjectUrl = null;
+      // ─── UNLOCK AUDIO ───
+      function unlockAudio() {
+        if (isAudioUnlocked) {
+          // If already unlocked, just play
+          playAudio();
+          return;
+        }
+        
+        // Try to unlock with a silent AudioContext first
+        try {
+          if (window.AudioContext || window.webkitAudioContext) {
+            const C = window.AudioContext || window.webkitAudioContext;
+            const ac = new C();
+            if (ac.state === 'suspended') {
+              ac.resume().then(() => {
+                // Now try to play the audio
+                const audio = dom.bgAudio;
+                if (audio) {
+                  audio.play().catch(() => {});
+                }
+              }).catch(() => {});
+            }
+          }
+        } catch (_) {}
+        
+        // Direct play attempt
+        const audio = dom.bgAudio;
+        if (audio) {
+          audio.play()
+            .then(() => {
+              isAudioUnlocked = true;
+              updateStatus('Playing', '▶');
+              if (dom.musicPlay) dom.musicPlay.classList.add('active');
+              if (dom.audioUnlockOverlay) {
+                dom.audioUnlockOverlay.style.display = 'none';
+                dom.audioUnlockOverlay.setAttribute('aria-hidden', 'true');
+              }
+              logDashboardAction('🔊 Audio unlocked and playing.');
+            })
+            .catch(() => {
+              // If it fails, show the overlay again
+              if (dom.audioUnlockOverlay) {
+                dom.audioUnlockOverlay.style.display = 'flex';
+                dom.audioUnlockOverlay.setAttribute('aria-hidden', 'false');
+              }
+            });
+        }
+      }
 
-    function getCustomizerCards() {
-      return [
-        { label: card1Label.value.trim(), desc: card1Desc.value.trim() },
-        { label: card2Label.value.trim(), desc: card2Desc.value.trim() },
-        { label: card3Label.value.trim(), desc: card3Desc.value.trim() },
-        { label: card4Label.value.trim(), desc: card4Desc.value.trim() }
-      ].filter(card => card.label.length);
-    }
+      function attemptAutoPlay() {
+        // Try to play after a short delay
+        setTimeout(() => {
+          const audio = dom.bgAudio;
+          if (audio) {
+            // First try to resume AudioContext
+            if (window.AudioContext || window.webkitAudioContext) {
+              try {
+                const C = window.AudioContext || window.webkitAudioContext;
+                const ac = new C();
+                if (ac.state === 'suspended') {
+                  ac.resume().catch(() => {});
+                }
+              } catch (_) {}
+            }
+            
+            audio.play()
+              .then(() => {
+                isAudioUnlocked = true;
+                updateStatus('Playing', '▶');
+                if (dom.musicPlay) dom.musicPlay.classList.add('active');
+                logDashboardAction('▶ Auto-play started: ' + TRACK_LIST[currentTrackIndex].name);
+              })
+              .catch(() => {
+                updateStatus('Click to enable audio', '⏸');
+                if (dom.audioUnlockOverlay) {
+                  dom.audioUnlockOverlay.style.display = 'flex';
+                  dom.audioUnlockOverlay.setAttribute('aria-hidden', 'false');
+                }
+              });
+          }
+        }, 300);
+      }
 
-    function buildCustomizerHtml() {
-      const cards = getCustomizerCards();
-      const bgStart = bgStartInput.value || '#0f0f1e';
-      const bgEnd = bgEndInput.value || '#1a1a2e';
-      const textColor = textColorInput.value || '#e0e0e0';
-      const cardBg = cardBgInput.value || '#16213e';
-      const cardText = cardTextInput.value || '#e0e0e0';
-      const title = siteTitleInput.value.trim() || 'Bricy\'s Hub';
-      const subtitle = siteSubtitleInput.value.trim() || 'Choose a tool to launch. More projects will be added here over time.';
-      const accent = brandTextInput.value.trim() || 'Bricy\'s';
+      // ─── Navigation ───
+      function showHub() {
+        dom.toolScreen.classList.remove('active');
+        dom.hubScreen.classList.remove('hidden');
+      }
 
-      const cardHtml = cards.map(card => `
-            <button class="tool-card">
-              <h2>${escapeHtml(card.label)}</h2>
-              <p>${escapeHtml(card.desc)}</p>
-            </button>`).join('\n');
+      function showToolPanel(toolName) {
+        const panels = {
+          cipher: document.querySelector('.cipher-panel'),
+          qr: document.querySelector('.qr-panel'),
+          htmlbuilder: document.querySelector('.htmlbuilder-panel'),
+          customizer: document.querySelector('.customizer-panel'),
+          json: document.querySelector('.json-panel'),
+          image: document.querySelector('.image-panel'),
+          password: document.querySelector('.password-panel'),
+          urltools: document.querySelector('.urltools-panel'),
+          random: document.querySelector('.random-panel'),
+          text: document.querySelector('.text-panel'),
+          colors: document.querySelector('.colors-panel'),
+        };
+        Object.values(panels).forEach(p => { if (p) p.classList.add('hidden'); });
+        if (panels[toolName]) panels[toolName].classList.remove('hidden');
+      }
 
-      return `<!DOCTYPE html>
+      function selectTool(toolName) {
+        dom.hubScreen.classList.add('hidden');
+        dom.toolScreen.classList.add('active');
+
+        const titles = {
+          cipher: ['🔐 Cipher Studio', 'Encode, decode, and analyze text with multiple cipher algorithms'],
+          qr: ['📱 QR Code Generator', 'Generate a QR code from any link instantly.'],
+          htmlbuilder: ['📝 HTML Builder', 'Create a downloadable .html file from raw HTML source.'],
+          customizer: ['🎨 Theme Customizer', 'Adjust colors, text, and buttons for a custom HTML download.'],
+          json: ['🗄️ JSON Formatter', 'Validate, pretty-print, and minify JSON data.'],
+          image: ['🖼️ Image Resizer', 'Resize images client-side and download the result.'],
+          password: ['🔑 Password Generator', 'Create strong, customizable passwords instantly.'],
+          urltools: ['🔗 URL Encoder/Decoder', 'Encode or decode URL components safely.'],
+          random: ['🎲 Random Number', 'Generate a random number within any range.'],
+          text: ['📊 Text Counter', 'Count words, characters, and lines in any text block.'],
+          colors: ['🎨 Color Extractor', 'Extract dominant colors from an image and copy hex values.'],
+        };
+        const [title, desc] = titles[toolName] || ['🔧 Tool', ''];
+        if (dom.toolTitle) dom.toolTitle.textContent = title;
+        if (dom.toolDesc) dom.toolDesc.textContent = desc;
+        showToolPanel(toolName);
+        logDashboardAction('🛠️ Opened: ' + title);
+      }
+
+      // ─── Search ───
+      function renderSearchResults(query) {
+        const q = query.trim().toLowerCase();
+        if (!q) { dom.searchResults.innerHTML = ''; return; }
+        const matches = dom.toolCards.filter(card => {
+          const title = card.querySelector('h2')?.textContent?.toLowerCase() || '';
+          const desc = card.querySelector('p')?.textContent?.toLowerCase() || '';
+          const tool = card.dataset.tool || '';
+          return title.includes(q) || desc.includes(q) || tool.includes(q);
+        });
+        if (!matches.length) {
+          dom.searchResults.innerHTML = '<div class="search-result"><h3>No matching tools</h3><p>Try another keyword.</p></div>';
+          return;
+        }
+        dom.searchResults.innerHTML = matches.map(card => `
+          <div class="search-result">
+            <div>
+              <h3>${card.querySelector('h2')?.textContent || ''}</h3>
+              <p>${card.querySelector('p')?.textContent || ''}</p>
+            </div>
+            <button data-tool="${card.dataset.tool}">Open</button>
+          </div>
+        `).join('');
+      }
+
+      // ─── Cipher Functions ───
+      function caesarShift(text, shift) {
+        return text.replace(/[a-z]/gi, ch => {
+          const code = ch.charCodeAt(0);
+          const base = code >= 97 ? 97 : 65;
+          return String.fromCharCode(((code - base + shift + 26) % 26) + base);
+        });
+      }
+
+      function vigenereTransform(text, keyword, decrypt = false) {
+        const key = keyword.toUpperCase().replace(/[^A-Z]/g, '');
+        if (!key.length) return text;
+        let idx = 0;
+        return text.replace(/[a-z]/gi, ch => {
+          const code = ch.charCodeAt(0);
+          const base = code >= 97 ? 97 : 65;
+          const shift = key.charCodeAt(idx % key.length) - 65;
+          idx++;
+          const offset = decrypt ? -shift : shift;
+          return String.fromCharCode(((code - base + offset + 26) % 26) + base);
+        });
+      }
+
+      function rot13(text) { return caesarShift(text, 13); }
+      function atbash(text) {
+        return text.replace(/[a-z]/gi, ch => {
+          const code = ch.charCodeAt(0);
+          const base = code >= 97 ? 97 : 65;
+          return String.fromCharCode(base + 25 - (code - base));
+        });
+      }
+
+      function substitutionCipher(text, alphabet, decrypt = false) {
+        if (alphabet.length < 26) return text;
+        const normal = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        return text.replace(/[a-z]/gi, ch => {
+          const upper = ch.toUpperCase();
+          const idx = normal.indexOf(upper);
+          if (idx === -1) return ch;
+          const newChar = decrypt ? normal[alphabet.toUpperCase().indexOf(upper)] : alphabet.toUpperCase()[idx];
+          return /[a-z]/.test(ch) ? newChar.toLowerCase() : newChar;
+        });
+      }
+
+      function base64Encode(text) {
+        try { return btoa(new TextEncoder().encode(text).reduce((s, b) => s + String.fromCharCode(b), '')); }
+        catch (_) { return 'Error encoding'; }
+      }
+
+      function base64Decode(text) {
+        try { return new TextDecoder().decode(Uint8Array.from(atob(text), c => c.charCodeAt(0))); }
+        catch (_) { return 'Error decoding'; }
+      }
+
+      function encryptText() {
+        const text = dom.inputText?.value || '';
+        if (!text) return;
+        let result = '';
+        switch (currentAlgo) {
+          case 'caesar': {
+            const shift = parseInt(dom.keyInput?.value || 0, 10);
+            result = caesarShift(text, shift);
+            break;
+          }
+          case 'vigenere': result = vigenereTransform(text, dom.keyInput?.value || '', false); break;
+          case 'rot13': result = rot13(text); break;
+          case 'atbash': result = atbash(text); break;
+          case 'substitution': result = substitutionCipher(text, dom.keyInput?.value || '', false); break;
+          case 'base64': result = base64Encode(text); break;
+        }
+        if (dom.encryptOutput) dom.encryptOutput.textContent = result;
+        if (dom.bruteSection) dom.bruteSection.style.display = 'none';
+      }
+
+      function decryptText() {
+        const text = dom.inputText?.value || '';
+        if (!text) return;
+        let result = '';
+        switch (currentAlgo) {
+          case 'caesar': {
+            const shift = parseInt(dom.keyInput?.value || 0, 10);
+            result = caesarShift(text, -shift);
+            break;
+          }
+          case 'vigenere': result = vigenereTransform(text, dom.keyInput?.value || '', true); break;
+          case 'rot13': result = rot13(text); break;
+          case 'atbash': result = atbash(text); break;
+          case 'substitution': result = substitutionCipher(text, dom.keyInput?.value || '', true); break;
+          case 'base64': result = base64Decode(text); break;
+        }
+        if (dom.decryptOutput) dom.decryptOutput.textContent = result;
+        if (dom.bruteSection) dom.bruteSection.style.display = 'none';
+      }
+
+      function bruteForce() {
+        if (currentAlgo !== 'caesar') {
+          dom.bruteList.innerHTML = '<div class="brute-item">Brute force only works with Caesar cipher.</div>';
+          dom.bruteSection.style.display = 'block';
+          return;
+        }
+        const text = dom.inputText?.value || '';
+        if (!text) return;
+        dom.bruteList.innerHTML = '';
+        for (let shift = 1; shift < 26; shift++) {
+          const item = document.createElement('div');
+          item.className = 'brute-item';
+          item.textContent = `Shift ${shift}: ${caesarShift(text, -shift)}`;
+          dom.bruteList.appendChild(item);
+        }
+        dom.bruteSection.style.display = 'block';
+      }
+
+      function updateAlgoButtons() {
+        dom.algoButtons.forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.algo === currentAlgo);
+        });
+        const keySection = dom.keySection;
+        if (currentAlgo === 'base64') {
+          keySection.style.display = 'none';
+        } else {
+          keySection.style.display = 'block';
+          const label = keySection.querySelector('label');
+          if (currentAlgo === 'caesar') {
+            label.textContent = 'Shift (1-25)';
+            dom.keyInput.type = 'number';
+            dom.keyInput.value = '3';
+            dom.keyNote.textContent = 'Enter a number from 1 to 25.';
+          } else if (currentAlgo === 'vigenere') {
+            label.textContent = 'Keyword';
+            dom.keyInput.type = 'text';
+            dom.keyInput.value = 'KEY';
+            dom.keyNote.textContent = 'Enter any word or phrase. Non-letters are ignored.';
+          } else if (currentAlgo === 'substitution') {
+            label.textContent = 'Alphabet';
+            dom.keyInput.type = 'text';
+            dom.keyInput.value = 'BCDEFGHIJKLMNOPQRSTUVWXYZA';
+            dom.keyNote.textContent = 'Enter 26 unique letters for substitution alphabet.';
+          } else {
+            label.textContent = 'Key';
+            dom.keyInput.type = 'text';
+            dom.keyInput.value = '';
+            dom.keyNote.textContent = '';
+          }
+        }
+      }
+
+      // ─── QR ───
+      async function generateQR() {
+        const url = dom.qrLinkInput?.value.trim();
+        if (!url) { dom.qrStatus.textContent = 'Enter a valid link first.'; dom.qrImage.style.display = 'none'; return; }
+        dom.qrStatus.textContent = 'Generating QR code...';
+        dom.qrImage.style.display = 'none';
+        if (currentQrObjectUrl) { URL.revokeObjectURL(currentQrObjectUrl); currentQrObjectUrl = null; }
+        try {
+          const resp = await fetch(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const blob = await resp.blob();
+          currentQrObjectUrl = URL.createObjectURL(blob);
+          dom.qrImage.src = currentQrObjectUrl;
+          dom.qrImage.style.display = 'block';
+          dom.qrStatus.textContent = '✅ QR code generated.';
+        } catch (_) {
+          dom.qrStatus.textContent = '❌ Unable to generate QR code.';
+        }
+      }
+
+      // ─── HTML Builder ───
+      function generateHtmlFile() {
+        const html = dom.htmlSourceInput?.value || '';
+        if (!html.trim()) {
+          dom.htmlStatus.textContent = 'Paste raw HTML before creating the file.';
+          dom.htmlDownloadLink.style.display = 'none';
+          return;
+        }
+        const filename = dom.htmlFilenameInput?.value.trim() || 'page.html';
+        const safe = filename.toLowerCase().endsWith('.html') ? filename : `${filename}.html`;
+        if (currentHtmlObjectUrl) { URL.revokeObjectURL(currentHtmlObjectUrl); currentHtmlObjectUrl = null; }
+        const blob = new Blob([html], { type: 'text/html' });
+        currentHtmlObjectUrl = URL.createObjectURL(blob);
+        dom.htmlDownloadLink.href = currentHtmlObjectUrl;
+        dom.htmlDownloadLink.download = safe;
+        dom.htmlDownloadLink.textContent = `📥 Download ${safe}`;
+        dom.htmlDownloadLink.style.display = 'inline-block';
+        dom.htmlStatus.textContent = '✅ HTML file ready. Click to download.';
+      }
+
+      // ─── Theme Customizer ───
+      function getCustomizerCards() {
+        return [
+          { label: dom.card1Label?.value?.trim() || 'Cipher Studio', desc: dom.card1Desc?.value?.trim() || 'Encrypt, decrypt, and analyze text.' },
+          { label: dom.card2Label?.value?.trim() || 'QR Code Generator', desc: dom.card2Desc?.value?.trim() || 'Generate a QR code from any link.' },
+          { label: dom.card3Label?.value?.trim() || 'HTML Builder', desc: dom.card3Desc?.value?.trim() || 'Create a downloadable .html file.' },
+          { label: dom.card4Label?.value?.trim() || 'JSON Formatter', desc: dom.card4Desc?.value?.trim() || 'Validate and pretty-print JSON.' },
+        ].filter(c => c.label);
+      }
+
+      function buildCustomHtml() {
+        const cards = getCustomizerCards();
+        const bgStart = dom.bgStartInput?.value || '#0f0f1e';
+        const bgEnd = dom.bgEndInput?.value || '#1a1a2e';
+        const textColor = dom.textColorInput?.value || '#e0e0e0';
+        const cardBg = dom.cardBgInput?.value || '#16213e';
+        const cardText = dom.cardTextInput?.value || '#e0e0e0';
+        const title = dom.siteTitleInput?.value?.trim() || "Bricy's Hub";
+        const subtitle = dom.siteSubtitleInput?.value?.trim() || 'Choose a tool to launch.';
+        const brand = dom.brandTextInput?.value?.trim() || "Bricy's";
+
+        const cardHtml = cards.map(c => `
+          <div class="tool-card">
+            <h2>${escapeHtml(c.label)}</h2>
+            <p>${escapeHtml(c.desc)}</p>
+          </div>
+        `).join('\n');
+
+        return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(title)}</title>
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; display: flex; justify-content: center; background: linear-gradient(135deg, ${bgStart} 0%, ${bgEnd} 100%); color: ${textColor}; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .app { width: 100%; max-width: 1200px; padding: 28px; display: flex; flex-direction: column; gap: 24px; }
-    header { text-align: center; color: white; }
-    header h1 { position: relative; margin: 0; font-size: 2.4rem; font-weight: 700; text-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-    header p { margin: 8px 0 0; font-size: 1rem; opacity: 0.95; }
-    .hub-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-    .tool-card { display: flex; flex-direction: column; align-items: flex-start; padding: 22px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.12); background: ${cardBg}; color: ${cardText}; text-align: left; min-height: 150px; cursor: default; }
-    .tool-card h2 { margin: 0 0 10px; font-size: 1.2rem; }
-    .tool-card p { margin: 0; color: rgba(255,255,255,0.85); line-height: 1.5; }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      background: linear-gradient(135deg, ${bgStart} 0%, ${bgEnd} 100%);
+      color: ${textColor};
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      padding: 24px;
+    }
+    .app { width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 24px; }
+    header { text-align: center; }
+    header h1 { font-size: 2.4rem; font-weight: 800; color: #fff; }
+    header p { opacity: 0.8; }
+    .hub-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .tool-card {
+      padding: 24px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: ${cardBg};
+      color: ${cardText};
+      min-height: 140px;
+    }
+    .tool-card h2 { margin: 0 0 8px; font-size: 1.2rem; }
+    .tool-card p { margin: 0; opacity: 0.8; line-height: 1.5; }
   </style>
 </head>
 <body>
   <div class="app">
     <header>
-      <h1><span style="font-weight:700;">${escapeHtml(accent)}</span> ${escapeHtml(title.replace(accent, '').trim())}</h1>
+      <h1><span style="font-weight:700;">${escapeHtml(brand)}</span> ${escapeHtml(title.replace(brand, '').trim())}</h1>
       <p>${escapeHtml(subtitle)}</p>
     </header>
-    <div class="hub-grid">${cardHtml}
-    </div>
+    <div class="hub-grid">${cardHtml}</div>
   </div>
 </body>
 </html>`;
-    }
-
-    function escapeHtml(text) {
-      return text.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-    }
-
-    function createCustomHtmlDownload() {
-      const html = buildCustomizerHtml();
-      if (currentCustomHtmlObjectUrl) {
-        URL.revokeObjectURL(currentCustomHtmlObjectUrl);
       }
-      currentCustomHtmlObjectUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-      customHtmlDownloadLink.href = currentCustomHtmlObjectUrl;
-      customHtmlDownloadLink.download = `${siteTitleInput.value.trim().replace(/\s+/g, '-').toLowerCase() || 'custom-site'}.html`;
-      customHtmlDownloadLink.textContent = `Download ${customHtmlDownloadLink.download}`;
-      customHtmlDownloadLink.style.display = 'inline-block';
-      customizerStatus.textContent = 'Customized HTML is ready. Click the link to download.';
-    }
 
-    generateCustomHtmlBtn.addEventListener('click', createCustomHtmlDownload);
-    resetCustomizerBtn.addEventListener('click', () => {
-      siteTitleInput.value = "Bricy's Hub";
-      siteSubtitleInput.value = 'Choose a tool to launch. More projects will be added here over time.';
-      brandTextInput.value = "Bricy's";
-      bgStartInput.value = '#0f0f1e';
-      bgEndInput.value = '#1a1a2e';
-      textColorInput.value = '#e0e0e0';
-      cardBgInput.value = '#16213e';
-      cardTextInput.value = '#e0e0e0';
-      card1Label.value = 'Cipher Studio';
-      card1Desc.value = 'Encrypt, decrypt, and analyze text with multiple cipher algorithms.';
-      card2Label.value = 'QR Code Generator';
-      card2Desc.value = 'Generate a QR code instantly from any link.';
-      card3Label.value = 'HTML File Builder';
-      card3Desc.value = 'Create an .html file from raw HTML source and download it instantly.';
-      card4Label.value = 'JSON Formatter';
-      card4Desc.value = 'Validate and pretty-print JSON, and minify for compact output.';
-      customHtmlDownloadLink.style.display = 'none';
-      customizerStatus.textContent = 'Customize the page and click "Create Customized HTML".';
-      if (currentCustomHtmlObjectUrl) {
-        URL.revokeObjectURL(currentCustomHtmlObjectUrl);
-        currentCustomHtmlObjectUrl = null;
+      function createCustomHtmlDownload() {
+        const html = buildCustomHtml();
+        if (currentCustomHtmlObjectUrl) { URL.revokeObjectURL(currentCustomHtmlObjectUrl); }
+        currentCustomHtmlObjectUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+        const name = `${(dom.siteTitleInput?.value?.trim() || 'custom-site').replace(/\s+/g, '-').toLowerCase()}.html`;
+        dom.customHtmlDownloadLink.href = currentCustomHtmlObjectUrl;
+        dom.customHtmlDownloadLink.download = name;
+        dom.customHtmlDownloadLink.textContent = `📥 Download ${name}`;
+        dom.customHtmlDownloadLink.style.display = 'inline-block';
+        dom.customizerStatus.textContent = '✅ Custom HTML ready. Click to download.';
       }
-    });
-    document.addEventListener('keydown', event => {
-      if ((event.key === 'ArrowLeft' || event.key === 'Escape') && !toolScreen.classList.contains('hidden')) {
-        showHub();
+
+      function resetCustomizer() {
+        dom.siteTitleInput.value = "Bricy's Hub";
+        dom.siteSubtitleInput.value = 'Choose a tool to launch. More projects will be added here over time.';
+        dom.brandTextInput.value = "Bricy's";
+        dom.bgStartInput.value = '#0f0f1e';
+        dom.bgEndInput.value = '#1a1a2e';
+        dom.textColorInput.value = '#e0e0e0';
+        dom.cardBgInput.value = '#16213e';
+        dom.cardTextInput.value = '#e0e0e0';
+        dom.card1Label.value = 'Cipher Studio';
+        dom.card1Desc.value = 'Encrypt, decrypt, and analyze text.';
+        dom.card2Label.value = 'QR Code Generator';
+        dom.card2Desc.value = 'Generate a QR code from any link.';
+        dom.card3Label.value = 'HTML Builder';
+        dom.card3Desc.value = 'Create a downloadable .html file.';
+        dom.card4Label.value = 'JSON Formatter';
+        dom.card4Desc.value = 'Validate and pretty-print JSON.';
+        dom.customHtmlDownloadLink.style.display = 'none';
+        dom.customizerStatus.textContent = 'Customize the page and click "Create Customized HTML".';
+        if (currentCustomHtmlObjectUrl) { URL.revokeObjectURL(currentCustomHtmlObjectUrl); currentCustomHtmlObjectUrl = null; }
       }
-    });
-    let currentAlgo = 'caesar';
 
-    function updateAlgoButtons() {
-      algoButtons.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.algo === currentAlgo);
-      });
-      updateKeyVisibility();
-    }
+      // ─── JSON ───
+      function formatJson() {
+        const s = dom.jsonInput?.value?.trim() || '';
+        if (!s) { dom.jsonOutput.textContent = 'Paste JSON first.'; return; }
+        try { dom.jsonOutput.textContent = JSON.stringify(JSON.parse(s), null, 2); }
+        catch (e) { dom.jsonOutput.textContent = 'Invalid JSON: ' + e.message; }
+      }
 
-    function updateKeyVisibility() {
-      if (currentAlgo === 'base64') {
-        keySection.style.display = 'none';
-      } else {
-        keySection.style.display = 'block';
-        const label = keySection.querySelector('label');
-        if (currentAlgo === 'caesar') {
-          label.textContent = 'Shift (1-25)';
-          keyInput.type = 'number';
-          keyInput.value = '3';
-          keyNote.textContent = 'Enter a number from 1 to 25.';
-        } else if (currentAlgo === 'vigenere') {
-          label.textContent = 'Keyword';
-          keyInput.type = 'text';
-          keyInput.value = 'KEY';
-          keyNote.textContent = 'Enter any word or phrase. Non-letters are ignored.';
-        } else if (currentAlgo === 'substitution') {
-          label.textContent = 'Alphabet';
-          keyInput.type = 'text';
-          keyInput.value = 'BCDEFGHIJKLMNOPQRSTUVWXYZA';
-          keyNote.textContent = 'Enter 26 unique letters for substitution alphabet.';
-        } else {
-          label.textContent = 'Key';
-          keyInput.type = 'text';
-          keyInput.value = '';
-          keyNote.textContent = '';
+      function minifyJson() {
+        const s = dom.jsonInput?.value?.trim() || '';
+        if (!s) { dom.jsonOutput.textContent = 'Paste JSON first.'; return; }
+        try { dom.jsonOutput.textContent = JSON.stringify(JSON.parse(s)); }
+        catch (e) { dom.jsonOutput.textContent = 'Invalid JSON: ' + e.message; }
+      }
+
+      // ─── Image Resizer ───
+      async function resizeImage() {
+        const file = dom.imageInput?.files?.[0];
+        if (!file) return alert('Choose an image first.');
+        const w = parseInt(dom.imageWidth?.value, 10) || null;
+        const h = parseInt(dom.imageHeight?.value, 10) || null;
+        if (!w && !h) { alert('Specify at least a width or height.'); return; }
+        const img = await new Promise((res, rej) => {
+          const i = new Image();
+          i.onload = () => res(i);
+          i.onerror = rej;
+          i.src = URL.createObjectURL(file);
+        });
+        const canvas = document.createElement('canvas');
+        canvas.width = w || Math.round(img.width * (h / img.height));
+        canvas.height = h || Math.round(img.height * (canvas.width / img.width));
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = file.name.replace(/(\.[^.]+)$/, '') + `-${canvas.width}x${canvas.height}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 'image/png');
+      }
+
+      // ─── Password Generator ───
+      function generatePassword() {
+        const len = Math.max(4, Math.min(128, parseInt(dom.pwLength?.value, 10) || 16));
+        let chars = '';
+        if (dom.pwLower?.checked) chars += 'abcdefghijklmnopqrstuvwxyz';
+        if (dom.pwUpper?.checked) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        if (dom.pwNumbers?.checked) chars += '0123456789';
+        if (dom.pwSymbols?.checked) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+        if (!chars) return '';
+        const rnd = crypto.getRandomValues(new Uint32Array(len));
+        return Array.from(rnd, n => chars[n % chars.length]).join('');
+      }
+
+      // ─── Color Extractor ───
+      async function extractColors() {
+        const file = dom.colorImageInput?.files?.[0];
+        if (!file) return alert('Choose an image first.');
+        const img = await new Promise((res, rej) => {
+          const i = new Image();
+          i.onload = () => res(i);
+          i.onerror = rej;
+          i.src = URL.createObjectURL(file);
+        });
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const stepX = Math.max(1, Math.floor(img.width / 6));
+        const stepY = Math.max(1, Math.floor(img.height / 4));
+        const colors = [];
+        for (let x = 0; x < img.width; x += stepX) {
+          for (let y = 0; y < img.height; y += stepY) {
+            const d = ctx.getImageData(x, y, 1, 1).data;
+            const hex = '#' + [d[0], d[1], d[2]].map(v => v.toString(16).padStart(2, '0')).join('');
+            if (!colors.includes(hex)) colors.push(hex);
+            if (colors.length >= 8) break;
+          }
+          if (colors.length >= 8) break;
         }
+        dom.colorPalette.innerHTML = '';
+        if (!colors.length) {
+          dom.colorPalette.textContent = 'No colors found.';
+          return;
+        }
+        colors.forEach(hex => {
+          const swatch = document.createElement('div');
+          swatch.className = 'color-swatch';
+          swatch.style.background = hex;
+          swatch.title = hex;
+          swatch.addEventListener('click', () => {
+            navigator.clipboard.writeText(hex);
+            swatch.textContent = '✓';
+            setTimeout(() => { swatch.textContent = ''; }, 800);
+          });
+          dom.colorPalette.appendChild(swatch);
+        });
       }
-    }
 
-    algoButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        currentAlgo = btn.dataset.algo;
+      // ─── Event Bindings ───
+      function init() {
+        // Particles
+        initParticles();
+        initScrollReveal();
+
+        // Audio
+        initAudio();
+        dom.musicPlay?.addEventListener('click', playAudio);
+        dom.musicPause?.addEventListener('click', pauseAudio);
+        dom.musicMute?.addEventListener('click', toggleMute);
+        dom.musicRestart?.addEventListener('click', restartTrack);
+        dom.musicVolume?.addEventListener('input', (e) => setVolume(e.target.value));
+        dom.progressBar?.addEventListener('click', seekAudio);
+        
+        // ─── FIXED: Enable Audio Button ───
+        dom.enableAudioBtn?.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          unlockAudio();
+        });
+
+        // ─── FIXED: Click anywhere on the overlay to enable ───
+        dom.audioUnlockOverlay?.addEventListener('click', function(e) {
+          // Only trigger if clicking the overlay background, not the panel itself
+          if (e.target === this) {
+            unlockAudio();
+          }
+        });
+
+        // ─── FIXED: Click anywhere on the page to help unlock ───
+        document.addEventListener('click', function clickUnlock() {
+          unlockAudio();
+          // Remove after first click to avoid spamming
+          document.removeEventListener('click', clickUnlock);
+        }, { once: true });
+
+        // Try to auto-play
+        setTimeout(attemptAutoPlay, 500);
+
+        // Dashboard
+        updateDashboardMetrics();
+        logDashboardAction('🚀 Dashboard initialized.');
+        logDashboardAction('🎵 Hotline Miami 2 soundtrack ready.');
+
+        // Navigation
+        dom.toolCards.forEach(card => {
+          card.addEventListener('click', () => selectTool(card.dataset.tool));
+        });
+        dom.backButton?.addEventListener('click', showHub);
+        document.addEventListener('keydown', (e) => {
+          if ((e.key === 'Escape' || e.key === 'ArrowLeft') && dom.toolScreen.classList.contains('active')) {
+            showHub();
+          }
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+          if (e.key === ' ' || e.key === 'Space') {
+            e.preventDefault();
+            if (dom.bgAudio.paused) {
+              playAudio();
+            } else {
+              pauseAudio();
+            }
+          }
+          if (e.key === 'm' || e.key === 'M') {
+            toggleMute();
+          }
+        });
+
+        // Search
+        dom.toolSearch?.addEventListener('input', () => renderSearchResults(dom.toolSearch.value));
+        dom.clearSearch?.addEventListener('click', () => {
+          dom.toolSearch.value = '';
+          renderSearchResults('');
+        });
+        dom.searchResults?.addEventListener('click', (e) => {
+          const btn = e.target.closest('button[data-tool]');
+          if (btn) {
+            selectTool(btn.dataset.tool);
+            dom.toolSearch.value = '';
+            renderSearchResults('');
+          }
+        });
+
+        // Cipher
+        dom.algoButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            currentAlgo = btn.dataset.algo;
+            updateAlgoButtons();
+          });
+        });
+        dom.encryptButton?.addEventListener('click', encryptText);
+        dom.decryptButton?.addEventListener('click', decryptText);
+        dom.bruteforceButton?.addEventListener('click', bruteForce);
+        dom.clearButton?.addEventListener('click', () => {
+          if (dom.inputText) dom.inputText.value = '';
+          if (dom.encryptOutput) dom.encryptOutput.textContent = '';
+          if (dom.decryptOutput) dom.decryptOutput.textContent = '';
+          if (dom.bruteList) dom.bruteList.innerHTML = '';
+          if (dom.bruteSection) dom.bruteSection.style.display = 'none';
+        });
+        dom.copyEncrypt?.addEventListener('click', () => {
+          navigator.clipboard.writeText(dom.encryptOutput?.textContent || '').then(() => {
+            dom.copyEncrypt.textContent = '✅ Copied!';
+            setTimeout(() => { dom.copyEncrypt.textContent = '📋 Copy'; }, 2000);
+          });
+        });
+        dom.copyDecrypt?.addEventListener('click', () => {
+          navigator.clipboard.writeText(dom.decryptOutput?.textContent || '').then(() => {
+            dom.copyDecrypt.textContent = '✅ Copied!';
+            setTimeout(() => { dom.copyDecrypt.textContent = '📋 Copy'; }, 2000);
+          });
+        });
         updateAlgoButtons();
-      });
-    });
 
-    function caesarShift(text, shift) {
-      return text.replace(/[a-z]/gi, char => {
-        const code = char.charCodeAt(0);
-        const base = code >= 97 ? 97 : 65;
-        return String.fromCharCode(((code - base + shift + 26) % 26) + base);
-      });
-    }
+        // QR
+        dom.generateQrButton?.addEventListener('click', generateQR);
+        dom.clearQrButton?.addEventListener('click', () => {
+          dom.qrLinkInput.value = '';
+          dom.qrStatus.textContent = '';
+          dom.qrImage.src = '';
+          dom.qrImage.style.display = 'none';
+          if (currentQrObjectUrl) { URL.revokeObjectURL(currentQrObjectUrl); currentQrObjectUrl = null; }
+        });
 
-    function vigenereTransform(text, keyword, decrypt = false) {
-      const key = keyword.toUpperCase().replace(/[^A-Z]/g, '');
-      if (!key.length) return text;
-      let index = 0;
-      return text.replace(/[a-z]/gi, char => {
-        const code = char.charCodeAt(0);
-        const base = code >= 97 ? 97 : 65;
-        const shift = key.charCodeAt(index % key.length) - 65;
-        index += 1;
-        const offset = decrypt ? -shift : shift;
-        return String.fromCharCode(((code - base + offset + 26) % 26) + base);
-      });
-    }
+        // HTML Builder
+        dom.generateHtmlButton?.addEventListener('click', generateHtmlFile);
+        dom.clearHtmlButton?.addEventListener('click', () => {
+          dom.htmlSourceInput.value = '';
+          dom.htmlFilenameInput.value = '';
+          dom.htmlStatus.textContent = 'This tool packages raw HTML into a downloadable .html file.';
+          dom.htmlDownloadLink.href = '#';
+          dom.htmlDownloadLink.textContent = '📥 Download HTML File';
+          dom.htmlDownloadLink.style.display = 'none';
+          if (currentHtmlObjectUrl) { URL.revokeObjectURL(currentHtmlObjectUrl); currentHtmlObjectUrl = null; }
+        });
 
-    function rot13(text) { return caesarShift(text, 13); }
-    function atbash(text) {
-      return text.replace(/[a-z]/gi, char => {
-        const code = char.charCodeAt(0);
-        const base = code >= 97 ? 97 : 65;
-        return String.fromCharCode(base + 25 - (code - base));
-      });
-    }
+        // Customizer
+        dom.generateCustomHtmlBtn?.addEventListener('click', createCustomHtmlDownload);
+        dom.resetCustomizerBtn?.addEventListener('click', resetCustomizer);
 
-    function substitutionCipher(text, alphabet, decrypt = false) {
-      if (alphabet.length < 26) return text;
-      const normalAlpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      let result = '';
-      for (let char of text) {
-        if (/[a-z]/i.test(char)) {
-          const idx = normalAlpha.indexOf(char.toUpperCase());
-          const newChar = decrypt
-            ? normalAlpha[alphabet.toUpperCase().indexOf(char.toUpperCase())]
-            : alphabet.toUpperCase()[idx];
-          result += /[a-z]/.test(char) ? newChar.toLowerCase() : newChar;
-        } else {
-          result += char;
-        }
+        // JSON
+        dom.formatJsonBtn?.addEventListener('click', formatJson);
+        dom.minifyJsonBtn?.addEventListener('click', minifyJson);
+        dom.copyJsonBtn?.addEventListener('click', () => {
+          navigator.clipboard.writeText(dom.jsonOutput?.textContent || '');
+        });
+
+        // Image
+        dom.resizeImageBtn?.addEventListener('click', resizeImage);
+        dom.clearImageBtn?.addEventListener('click', () => {
+          dom.imageInput.value = '';
+          dom.imagePreview.src = '';
+          dom.imagePreview.style.display = 'none';
+          dom.imageWidth.value = '';
+          dom.imageHeight.value = '';
+          if (currentImagePreviewUrl) { URL.revokeObjectURL(currentImagePreviewUrl); currentImagePreviewUrl = null; }
+        });
+        dom.imageInput?.addEventListener('change', () => {
+          const f = dom.imageInput.files?.[0];
+          if (!f) return;
+          if (currentImagePreviewUrl) { URL.revokeObjectURL(currentImagePreviewUrl); }
+          currentImagePreviewUrl = URL.createObjectURL(f);
+          dom.imagePreview.src = currentImagePreviewUrl;
+          dom.imagePreview.style.display = 'block';
+        });
+
+        // Password
+        dom.genPwBtn?.addEventListener('click', () => {
+          const p = generatePassword();
+          dom.pwOutput.textContent = p || 'Enable at least one character set.';
+        });
+        dom.clearPwBtn?.addEventListener('click', () => {
+          dom.pwOutput.textContent = 'No password yet.';
+          dom.pwLength.value = '16';
+          dom.pwLower.checked = true;
+          dom.pwUpper.checked = true;
+          dom.pwNumbers.checked = true;
+          dom.pwSymbols.checked = false;
+        });
+        dom.copyPwBtn?.addEventListener('click', () => {
+          navigator.clipboard.writeText(dom.pwOutput?.textContent || '');
+        });
+
+        // URL Tools
+        dom.encodeUrlBtn?.addEventListener('click', () => {
+          try { dom.urlToolResult.textContent = encodeURIComponent(dom.urlToolInput?.value || ''); }
+          catch (_) { dom.urlToolResult.textContent = 'Error encoding'; }
+        });
+        dom.decodeUrlBtn?.addEventListener('click', () => {
+          try { dom.urlToolResult.textContent = decodeURIComponent(dom.urlToolInput?.value || ''); }
+          catch (_) { dom.urlToolResult.textContent = 'Invalid encoding'; }
+        });
+        dom.copyUrlToolBtn?.addEventListener('click', () => {
+          navigator.clipboard.writeText(dom.urlToolResult?.textContent || '');
+        });
+
+        // Random
+        dom.generateRandomBtn?.addEventListener('click', () => {
+          const min = parseInt(dom.randMin?.value, 10);
+          const max = parseInt(dom.randMax?.value, 10);
+          if (isNaN(min) || isNaN(max) || min > max) {
+            dom.randomResult.textContent = 'Enter valid min and max.';
+            return;
+          }
+          dom.randomResult.textContent = Math.floor(Math.random() * (max - min + 1)) + min;
+        });
+        dom.clearRandomBtn?.addEventListener('click', () => {
+          dom.randMin.value = '1';
+          dom.randMax.value = '100';
+          dom.randomResult.textContent = 'No number yet.';
+        });
+
+        // Text Counter
+        dom.countTextBtn?.addEventListener('click', () => {
+          const t = dom.textCounterInput?.value || '';
+          const lines = t.split(/\r?\n/).filter(Boolean).length;
+          const words = t.trim().split(/\s+/).filter(Boolean).length;
+          const chars = t.length;
+          dom.textResult.textContent = `Lines: ${lines}\nWords: ${words}\nCharacters: ${chars}`;
+        });
+        dom.clearTextBtn?.addEventListener('click', () => {
+          dom.textCounterInput.value = '';
+          dom.textResult.textContent = 'No text yet.';
+        });
+
+        // Colors
+        dom.extractColorsBtn?.addEventListener('click', extractColors);
+        dom.clearColorsBtn?.addEventListener('click', () => {
+          dom.colorImageInput.value = '';
+          dom.colorPalette.innerHTML = 'No colors yet.';
+        });
       }
-      return result;
-    }
 
-    function base64Encode(text) {
-      try {
-        const encoder = new TextEncoder();
-        const bytes = encoder.encode(text);
-        let binary = '';
-        for (const byte of bytes) {
-          binary += String.fromCharCode(byte);
-        }
-        return btoa(binary);
-      } catch (e) {
-        return 'Error encoding';
+      // ─── Boot ───
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
       }
-    }
-
-    function base64Decode(text) {
-      try {
-        const binary = atob(text);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i += 1) {
-          bytes[i] = binary.charCodeAt(i);
-        }
-        return new TextDecoder().decode(bytes);
-      } catch (e) {
-        return 'Error decoding';
-      }
-    }
-
-    function encrypt() {
-      const text = inputText.value;
-      if (!text) return;
-      let result = '';
-      if (currentAlgo === 'caesar') {
-        const shift = parseInt(keyInput.value, 10) || 0;
-        result = caesarShift(text, shift);
-      } else if (currentAlgo === 'vigenere') {
-        result = vigenereTransform(text, keyInput.value, false);
-      } else if (currentAlgo === 'rot13') {
-        result = rot13(text);
-      } else if (currentAlgo === 'atbash') {
-        result = atbash(text);
-      } else if (currentAlgo === 'substitution') {
-        result = substitutionCipher(text, keyInput.value, false);
-      } else if (currentAlgo === 'base64') {
-        result = base64Encode(text);
-      }
-      encryptOutput.textContent = result;
-      bruteSection.style.display = 'none';
-    }
-
-    function decrypt() {
-      const text = inputText.value;
-      if (!text) return;
-      let result = '';
-      if (currentAlgo === 'caesar') {
-        const shift = parseInt(keyInput.value, 10) || 0;
-        result = caesarShift(text, -shift);
-      } else if (currentAlgo === 'vigenere') {
-        result = vigenereTransform(text, keyInput.value, true);
-      } else if (currentAlgo === 'rot13') {
-        result = rot13(text);
-      } else if (currentAlgo === 'atbash') {
-        result = atbash(text);
-      } else if (currentAlgo === 'substitution') {
-        result = substitutionCipher(text, keyInput.value, true);
-      } else if (currentAlgo === 'base64') {
-        result = base64Decode(text);
-      }
-      decryptOutput.textContent = result;
-      bruteSection.style.display = 'none';
-    }
-
-    function bruteForce() {
-      if (currentAlgo !== 'caesar') {
-        bruteList.innerHTML = '<div class="brute-item">Brute force only works with Caesar cipher.</div>';
-        bruteSection.style.display = 'block';
-        return;
-      }
-      const text = inputText.value;
-      if (!text) return;
-      bruteList.innerHTML = '';
-      for (let shift = 1; shift < 26; shift += 1) {
-        const result = caesarShift(text, -shift);
-        const item = document.createElement('div');
-        item.className = 'brute-item';
-        item.textContent = `Shift ${shift}: ${result}`;
-        bruteList.appendChild(item);
-      }
-      bruteSection.style.display = 'block';
-    }
-
-    encryptButton.addEventListener('click', encrypt);
-    decryptButton.addEventListener('click', decrypt);
-    bruteforceButton.addEventListener('click', bruteForce);
-    clearButton.addEventListener('click', () => {
-      inputText.value = '';
-      encryptOutput.textContent = '';
-      decryptOutput.textContent = '';
-      bruteList.innerHTML = '';
-      bruteSection.style.display = 'none';
-    });
-
-    copyEncryptBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(encryptOutput.textContent).then(() => {
-        copyEncryptBtn.textContent = 'Copied!';
-        setTimeout(() => { copyEncryptBtn.textContent = 'Copy'; }, 2000);
-      });
-    });
-
-    copyDecryptBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(decryptOutput.textContent).then(() => {
-        copyDecryptBtn.textContent = 'Copied!';
-        setTimeout(() => { copyDecryptBtn.textContent = 'Copy'; }, 2000);
-      });
-    });
-
-    updateKeyVisibility();
-
-    updateDashboardMetrics();
-    initDashboard();
-
-    // JSON formatter
-    if (formatJsonBtn) formatJsonBtn.addEventListener('click', () => {
-      const s = (jsonInput.value || '').trim();
-      if (!s) { jsonOutput.textContent = 'Paste JSON first.'; return; }
-      try { jsonOutput.textContent = JSON.stringify(JSON.parse(s), null, 2); } catch (e) { jsonOutput.textContent = 'Invalid JSON: ' + e.message; }
-    });
-    if (minifyJsonBtn) minifyJsonBtn.addEventListener('click', () => {
-      const s = (jsonInput.value || '').trim();
-      if (!s) { jsonOutput.textContent = 'Paste JSON first.'; return; }
-      try { jsonOutput.textContent = JSON.stringify(JSON.parse(s)); } catch (e) { jsonOutput.textContent = 'Invalid JSON: ' + e.message; }
-    });
-    if (copyJsonBtn) copyJsonBtn.addEventListener('click', () => { navigator.clipboard.writeText(jsonOutput.textContent || ''); });
-
-    // Image resizer (client-side)
-    if (resizeImageBtn) resizeImageBtn.addEventListener('click', async () => {
-      const file = imageInput.files && imageInput.files[0];
-      if (!file) return alert('Choose an image first');
-      const w = parseInt(imageWidth.value, 10) || null;
-      const h = parseInt(imageHeight.value, 10) || null;
-      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file); });
-      const canvas = document.createElement('canvas');
-      if (!w && !h) { alert('Specify at least a width or height'); return; }
-      if (!w) canvas.width = Math.round(img.width * (h / img.height)); else canvas.width = w;
-      if (!h) canvas.height = Math.round(img.height * (canvas.width / img.width)); else canvas.height = h;
-      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob(blob => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = file.name.replace(/(\.[^.]+)$/, '') + `-${canvas.width}x${canvas.height}.png`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-      }, 'image/png');
-    });
-    if (clearImageBtn) clearImageBtn.addEventListener('click', () => {
-      imageInput.value = '';
-      imagePreview.src = '';
-      imagePreview.style.display = 'none';
-      imageWidth.value = '';
-      imageHeight.value = '';
-      if (currentImagePreviewUrl) {
-        URL.revokeObjectURL(currentImagePreviewUrl);
-        currentImagePreviewUrl = null;
-      }
-    });
-    if (imageInput) imageInput.addEventListener('change', () => {
-      const f = imageInput.files && imageInput.files[0];
-      if (!f) return;
-      if (currentImagePreviewUrl) {
-        URL.revokeObjectURL(currentImagePreviewUrl);
-      }
-      currentImagePreviewUrl = URL.createObjectURL(f);
-      imagePreview.src = currentImagePreviewUrl;
-      imagePreview.style.display = 'block';
-    });
-
-    // Password generator
-    function generatePassword() {
-      const length = Math.max(4, Math.min(128, parseInt(pwLength.value, 10) || 16));
-      let chars = '';
-      if (pwLower.checked) chars += 'abcdefghijklmnopqrstuvwxyz';
-      if (pwUpper.checked) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      if (pwNumbers.checked) chars += '0123456789';
-      if (pwSymbols.checked) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
-      if (!chars) return '';
-      let out = '';
-      const rnd = crypto.getRandomValues(new Uint32Array(length));
-      for (let i = 0; i < length; i++) out += chars[rnd[i] % chars.length];
-      return out;
-    }
-    if (genPwBtn) genPwBtn.addEventListener('click', () => { const p = generatePassword(); pwOutput.textContent = p || 'Enable at least one character set'; });
-    if (clearPwBtn) clearPwBtn.addEventListener('click', () => { pwOutput.textContent = 'No password yet.'; pwLength.value = '16'; pwLower.checked = true; pwUpper.checked = true; pwNumbers.checked = true; pwSymbols.checked = false; });
-    if (copyPwBtn) copyPwBtn.addEventListener('click', () => { navigator.clipboard.writeText(pwOutput.textContent || ''); });
-
-    // URL encode/decode
-    if (encodeUrlBtn) encodeUrlBtn.addEventListener('click', () => { try { urlToolResult.textContent = encodeURIComponent(urlToolInput.value || ''); } catch (e) { urlToolResult.textContent = 'Error'; } });
-    if (decodeUrlBtn) decodeUrlBtn.addEventListener('click', () => { try { urlToolResult.textContent = decodeURIComponent(urlToolInput.value || ''); } catch (e) { urlToolResult.textContent = 'Invalid encoding'; } });
-    if (copyUrlToolBtn) copyUrlToolBtn.addEventListener('click', () => { navigator.clipboard.writeText(urlToolResult.textContent || ''); });
-
-    // Color extractor (simple: sample a few pixels)
-    if (extractColorsBtn) extractColorsBtn.addEventListener('click', async () => {
-      const f = colorImageInput.files && colorImageInput.files[0]; if (!f) return alert('Choose an image');
-      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(f); });
-      const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height; const ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0);
-      const stepX = Math.max(1, Math.floor(img.width / 6)); const stepY = Math.max(1, Math.floor(img.height / 4));
-      const cols = new Set();
-      for (let x = 0; x < img.width; x += stepX) for (let y = 0; y < img.height; y += stepY) {
-        const p = ctx.getImageData(x,y,1,1).data; cols.add('#' + [p[0],p[1],p[2]].map(v => v.toString(16).padStart(2,'0')).join(''));
-        if (cols.size >= 8) break;
-      }
-      colorPalette.innerHTML = '';
-      if (!cols.size) colorPalette.textContent = 'No colors found';
-      cols.forEach(hex => {
-        const d = document.createElement('div'); d.style.width = '40px'; d.style.height = '40px'; d.style.borderRadius = '6px'; d.style.background = hex; d.title = hex; d.style.cursor = 'pointer'; d.addEventListener('click', () => { navigator.clipboard.writeText(hex); d.textContent = '✓'; setTimeout(() => { d.textContent = ''; }, 800); }); colorPalette.appendChild(d);
-      });
-    });
-    if (clearColorsBtn) clearColorsBtn.addEventListener('click', () => { colorImageInput.value = ''; colorPalette.innerHTML = 'No colors yet.'; });
-
-    initBackground();
+    })();
   </script>
 </body>
 </html>
